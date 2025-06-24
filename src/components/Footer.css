@@ -1,0 +1,77 @@
+.footer {
+  background-color: var(--primary-color);
+  padding: 4rem 0 2rem;
+}
+
+.platforms {
+  display: flex;
+  justify-content: center; /* Centers the group of platform links horizontally */
+  gap: 3rem;
+  /* Ensure the .platforms container itself is centered on the page and takes full width */
+  width: 100%; /* Make it take full available width */
+  max-width: 1200px; /* Optional: constrain max width for larger screens to prevent overstretching */
+  margin: 0 auto 3rem auto; /* Centers the block horizontally and adds bottom margin */
+}
+
+.platform-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers content (icon and name) horizontally within each link */
+  text-decoration: none;
+  color: var(--text-color);
+  transition: transform 0.3s ease;
+  /* Make each platform link take equal horizontal space on desktop */
+  flex: 1; /* Allows each link to grow and shrink, taking an equal share of space */
+  min-width: 0; /* Prevents content from overflowing if it's too wide */
+}
+
+.platform-link:hover {
+  transform: translateY(-10px);
+  color: var(--platform-color);
+}
+
+.platform-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.platform-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .platforms {
+    flex-direction: column;
+    align-items: center; /* Centers platform links horizontally when stacked in a column */
+    gap: 2rem;
+    margin-bottom: 2rem; /* Adjust margin for mobile */
+  }
+
+  .platform-link {
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center; /* Centers content vertically within the link (icon and name) */
+    justify-content: center; /* Centers content horizontally within the link (icon and name) */
+    flex: none; /* Reset flex properties for mobile to allow content-based width */
+    width: 100%; /* Make each link take full width on mobile to ensure centering */
+    max-width: 300px; /* Optional: constrain max width for individual mobile links */
+  }
+
+  .platform-icon {
+    font-size: 2rem;
+    margin-bottom: 0;
+  }
+}

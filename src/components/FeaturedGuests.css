@@ -1,0 +1,72 @@
+.featured-guests {
+  background-color: var(--background-color);
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: var(--accent-color);
+}
+
+.guests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.guest-card {
+  background: linear-gradient(
+    145deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.guest-card:hover {
+  transform: translateY(-10px);
+}
+
+.guest-image {
+  position: relative;
+  padding-bottom: 100%;
+  overflow: hidden;
+}
+
+.guest-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.guest-card:hover .guest-image img {
+  transform: scale(1.1);
+}
+
+.guest-card h3 {
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  background: rgba(10, 31, 38, 0.8);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .guests-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+} 
