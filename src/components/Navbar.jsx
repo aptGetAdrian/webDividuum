@@ -1,17 +1,33 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const location = useLocation();
+
+  const getScrollThreshold = () => {
+    switch (location.pathname) {
+      case '/':
+        return 700;
+      case '/epizode':
+        return 200;
+      case '/o-nama':
+        return 50;
+      case '/podpora':
+        return 500;
+      default:
+        return 400;
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      // Change this value to adjust when the navbar becomes solid
-      const scrollThreshold = 700; 
+      const scrollThreshold = getScrollThreshold(); 
       
       setIsScrolled(scrollPosition > scrollThreshold);
     };
@@ -45,7 +61,7 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Link to="/o-nama">O nama</Link>
+            <Link to="/o-nama">O podkastu</Link>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}

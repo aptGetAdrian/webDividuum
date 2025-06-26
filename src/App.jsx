@@ -5,6 +5,7 @@ import About from './components/About';
 import Footer from './components/Footer';
 import './index.css';
 import Hosts from './components/Hosts';
+import Episodes from './components/Episodes';
 
 function App() {
   return (
@@ -14,14 +15,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/o-nama" element={<Hosts />} />
-          <Route path="/epizode" element={
-            <div className="coming-soon section">
-              <div className="container">
-                <h1>Epizode</h1>
-                <p>Coming soon...</p>
-              </div>
-            </div>
-          } />
+          <Route path="/epizode" element={<Episodes/>} />
           <Route path="/podpora" element={
             <div className="coming-soon section">
               <div className="container">

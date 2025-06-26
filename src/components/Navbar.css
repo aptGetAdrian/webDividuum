@@ -5,14 +5,17 @@
   width: 100%;
   top: 0;
   z-index: 1000;
-  padding: 1rem 0;
+  padding: 1.5rem 0; /* Increased padding */
   transition: all 0.3s ease; /* Smooth transition */
   box-shadow: none; /* No shadow initially */
+  height: 8vh; /* Add explicit height */
 }
 
 .navbar.scrolled {
   background-color: rgba(10, 31, 38, 0.95); /* Original opacity when scrolled */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Drop shadow when scrolled */
+  padding: 1.2rem 0; /* Slightly reduced when scrolled for a nice effect */
+  height: 7vh; /* Add explicit height for scrolled state */
 }
 
 .nav-container {
@@ -27,7 +30,7 @@
 
 .nav-links {
   display: flex;
-  gap: 4rem;
+  gap: 4.5rem; /* Increased gap between links */
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -38,25 +41,31 @@
 .nav-links a {
   color: var(--text-color);
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
+  font-size: 1.1rem; /* Increased font size */
+  font-weight: 600; /* Made text bolder */
+  letter-spacing: 0.5px; /* Added letter spacing */
+  text-transform: uppercase; /* Made text uppercase */
+  transition: all 0.3s ease;
   position: relative;
   padding: 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Added subtle text shadow */
 }
 
 .nav-links a::after {
   content: '';
   position: absolute;
-  bottom: -5px;
+  bottom: -6px; /* Slightly lowered the underline */
   left: 0;
   width: 0;
-  height: 2px;
+  height: 2.5px; /* Made underline slightly thicker */
   background-color: var(--accent-color);
   transition: width 0.3s ease;
+  border-radius: 2px; /* Rounded the underline edges */
 }
 
 .nav-links a:hover {
   color: var(--accent-color);
+  transform: translateY(-1px); /* Slight lift effect on hover */
 }
 
 .nav-links a:hover::after {
@@ -77,15 +86,17 @@
 }
 
 .hamburger span {
-  width: 25px;
-  height: 2px;
+  width: 30px; /* Made hamburger slightly bigger */
+  height: 2.5px; /* Made lines slightly thicker */
   background-color: var(--text-color);
   transition: all 0.3s ease;
+  border-radius: 2px; /* Rounded the edges of hamburger lines */
 }
 
 @media (max-width: 768px) {
   .nav-container {
     justify-content: flex-end;
+    height: 100%;
   }
 
   .hamburger {
@@ -94,25 +105,31 @@
 
   .nav-links {
     position: fixed;
-    top: 70px;
+    top: var(--navbar-height, 76px);
     right: -100%;
     flex-direction: column;
-    background-color: var(--background-color);
+    background-color: rgba(10, 31, 38, 0.98);
+    backdrop-filter: blur(10px);
     width: 100%;
     text-align: center;
-    padding: 2rem 0;
-    transition: right 0.3s ease;
-    gap: 2rem;
+    padding: 2.5rem 0;
+    transition: right 0.3s ease, top 0.3s ease;
+    gap: 2.5rem;
     margin: 0;
     max-width: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
 
   .nav-links.active {
     right: 0;
   }
 
+  .navbar.scrolled .nav-links {
+    top: var(--navbar-height-scrolled, 68px);
+  }
+
   .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 6px);
+    transform: rotate(45deg) translate(9px, 7px);
   }
 
   .hamburger.active span:nth-child(2) {
@@ -120,6 +137,6 @@
   }
 
   .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -5px);
+    transform: rotate(-45deg) translate(8px, -6px);
   }
 }

@@ -19,10 +19,8 @@
   align-items: center; /* Centers content (icon and name) horizontally within each link */
   text-decoration: none;
   color: var(--text-color);
-  transition: transform 0.3s ease;
-  /* Make each platform link take equal horizontal space on desktop */
-  flex: 1; /* Allows each link to grow and shrink, taking an equal share of space */
-  min-width: 0; /* Prevents content from overflowing if it's too wide */
+  flex: 1; 
+  min-width: 0; 
 }
 
 .platform-link:hover {
@@ -33,7 +31,6 @@
 .platform-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  transition: color 0.3s ease;
 }
 
 .platform-name {

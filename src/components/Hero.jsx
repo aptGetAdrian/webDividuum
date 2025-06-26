@@ -1,12 +1,22 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Hero.css';
+import { useGlitch } from 'react-powerglitch'
+
 
 const Hero = () => {
   const [latestVideoId, setLatestVideoId] = useState('YOUR_VIDEO_ID'); // fallback
   const [videoData, setVideoData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showVideo, setShowVideo] = useState(false);
+  const glitch = useGlitch({
+    playMode: 'hover',
+    timing: { duration: 550, iterations: 1 },
+    glitchTimeSpan: { start: 0, end: 1 },
+    shake: { velocity: 12, amplitudeX: 0.2, amplitudeY: 0.19 },
+    slice: { count: 6, velocity: 15, minHeight: 0.02, maxHeight: 0.15, hueRotate: true },
+    pulse: { scale: 1 }
+  });
 
   // Replace with your actual values
   const YOUTUBE_API_KEY = "AIzaSyCm-rssnRQLky7FWziD2cIm9K9jcneTu44";
@@ -90,6 +100,9 @@ const Hero = () => {
   };
 
   return (
+    <>
+
+
     <section className="hero">
       {/* Background Video */}
       <div className="hero-background-video">
@@ -100,7 +113,7 @@ const Hero = () => {
           playsInline
           className="background-video"
         >
-          <source src="/assets/2xjgrOESzPPE6fTBRWcUtOQX5d2.mp4" type="video/mp4" />
+          <source src="/assets/videoplayback_1.webm" type="video/mp4" />
         </video>
       </div>
       
@@ -113,25 +126,115 @@ const Hero = () => {
       <div className="container hero-content">
         <motion.div 
           className="hero-text"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '150%', minHeight: '350px', paddingTop: '40px' }}
         >
-          <h1>INDIVIDUUM
-            PODCAST</h1>
-          <p>Raziskujemo zgodbe, delimo znanje in povezujemo ljudi</p>
-          <button className="btn btn-primary">Poslušaj Zdaj</button>
+          <div className="banner-image-wrapper" style={{ width: '150%', maxWidth: '1800px', margin: '0 auto', display: 'block', position: 'relative' }}>
+            <a href="https://www.youtube.com/@IndividuumPodcast" target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>
+              <img 
+                src="/assets/bannerText01-150.png" 
+                alt="Individuum Podcast Banner" 
+                className="hero-banner-image swap-banner-image"
+                style={{ width: '100%', height: 'auto', display: 'block', margin: 0, position: 'relative', zIndex: 2 }}
+                ref={glitch.ref}
+              />
+              <img
+                src="/assets/bannerText02-150.png"
+                alt="Individuum Podcast Banner Hover"
+                className="hero-banner-image hover-banner"
+                style={{ width: '100%', height: 'auto', display: 'block', margin: 0, position: 'absolute', left: 0, top: 0, zIndex: 3 }}
+                ref={glitch.ref}
+              />
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+
+    <section className="hero-second">
+      <div className="hero-background-video-second">
+        <img
+          src="/assets/backgroundimaheM.png"
+          alt="Background"
+          className="background-image-second"
+        />
+      </div>
+      
+      <div className="film-grain-second"></div>
+      <div className="hero-overlay-second"></div>
+      
+      <div className="container hero-content-second">
+        <motion.div 
+          className="hero-text-second"
+          initial={{ 
+            opacity: 0, 
+            y: 30,
+            scale: 0.95
+          }}
+          whileInView={{ 
+            opacity: 1, 
+            y: 0,
+            scale: 1
+          }}
+          transition={{ 
+            duration: 0.8,
+            ease: "easeOut"
+          }}
+          viewport={{ once: true }}
+        >
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            INDIVIDUUM PODKAST
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            Raziskujemo zgodbe, delimo znanje in povezujemo ljudi
+          </motion.p>
+          <motion.a 
+            href="https://linktr.ee/individuumpodcast" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <button className="btn-primary-second">Poslušaj zdaj</button>
+          </motion.a>
         </motion.div>
         
         <motion.div 
-          className="hero-video"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          className="hero-video-second"
+          initial={{ 
+            opacity: 0, 
+            y: 30
+          }}
+          whileInView={{ 
+            opacity: 1, 
+            y: 0
+          }}
+          transition={{ 
+            duration: 0.6,
+            delay: 0.3,
+            ease: "easeOut"
+          }}
+          viewport={{ once: true }}
         >
-          <div className="video-container">
+          <div className="video-container-second">
             {loading ? (
-              <div className="loading-placeholder">Loading latest video...</div>
+              <div className="loading-placeholder-second">Loading latest video...</div>
             ) : showVideo ? (
               <iframe
                 src={`https://www.youtube.com/embed/${latestVideoId}?autoplay=1`}
@@ -139,26 +242,23 @@ const Hero = () => {
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                className="video-iframe-second"
               ></iframe>
             ) : (
-              <div className="video-thumbnail" onClick={handlePlayClick}>
+              <div className="video-thumbnail-second" onClick={handlePlayClick}>
                 <img 
                   src={`https://img.youtube.com/vi/${latestVideoId}/maxresdefault.jpg`}
                   alt={videoData?.title || "Latest video thumbnail"}
-                  className="thumbnail-image"
+                  className="thumbnail-image-second"
                 />
-                <div className="play-button-overlay">
-                  <svg 
-                    className="play-icon" 
-                    viewBox="0 0 24 24" 
-                    fill="currentColor"
-                  >
+                <div className="play-button-overlay-second">
+                  <svg className="play-icon-second" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M8 5v14l11-7z"/>
                   </svg>
                 </div>
                 {videoData && (
-                  <div className="video-info-overlay">
-                    <h3 className="video-title">{videoData.title}</h3>
+                  <div className="video-info-overlay-second">
+                    <h3 className="video-title-second">{videoData.title}</h3>
                   </div>
                 )}
               </div>
@@ -167,6 +267,8 @@ const Hero = () => {
         </motion.div>
       </div>
     </section>
+
+    </>
   );
 };
 

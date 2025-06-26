@@ -3,16 +3,17 @@ import './FeaturedGuests.css';
 
 const FeaturedGuests = () => {
   const guests = [
-    { id: 1, name: 'Ime Gosta 1', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face' },
-    { id: 2, name: 'Ime Gosta 2', image: 'https://www.wikihow.com/images/9/90/What_type_of_person_are_you_quiz_pic.png' },
-    { id: 3, name: 'Ime Gosta 3', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face' },
-    { id: 4, name: 'Ime Gosta 4', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face' },
-    { id: 5, name: 'Ime Gosta 5', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face' },
-    { id: 6, name: 'Ime Gosta 6', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face' },
+    { id: 1, name: 'Dr. Viktor Markelj', image: '/assets/guests/viktorMarkelj.png', link: 'https://www.youtube.com/watch?v=NpdTZQ3u2_Q' },
+    { id: 2, name: 'Matej Skoliber', image: '/assets/guests/matejSkoliber.png', link: 'https://www.youtube.com/watch?v=ub_pnkapdxo' },
+    { id: 3, name: 'Damijan Janžekovič', image: '/assets/guests/damijanJanzekovic.png', link: 'https://www.youtube.com/watch?v=AkM8cE0vj7c' },
+    { id: 4, name: 'Grega Ivančič', image: '/assets/guests/gregaIvancic.png', link: 'https://www.youtube.com/watch?v=XJ8QTTpcj5E' },
+    { id: 5, name: 'Dr. Ivan Rihtarič', image: '/assets/guests/ivanRihtarič.png', link: 'https://www.youtube.com/watch?v=ptYK6YBr1hc' },
+    { id: 6, name: 'Dr. Martin Bele', image: '/assets/guests/martinBele.png', link: 'https://www.youtube.com/watch?v=KpYAdUFFUhY' },
   ];
 
   return (
     <section className="featured-guests section">
+      
       <div className="container">
         <motion.h2
           className="section-title"
@@ -21,17 +22,18 @@ const FeaturedGuests = () => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          Najnovejši gostje
+          Pogovori z gosti kot so:
         </motion.h2>
         
         <div className="guests-grid">
-          {guests.map((guest, index) => (
+          {guests.map((guest) => (
+            <a key={guest.id} href={guest.link} target="_blank" rel="noopener noreferrer">
             <motion.div
               key={guest.id}
               className="guest-card"
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
               <div className="guest-image">
@@ -39,9 +41,11 @@ const FeaturedGuests = () => {
               </div>
               <h3>{guest.name}</h3>
             </motion.div>
+            </a>
           ))}
         </div>
       </div>
+      
     </section>
   );
 };

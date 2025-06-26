@@ -5,6 +5,8 @@
   --background-color: #0a1f26;
   --text-color: #ffffff;
   --text-secondary: #e0e0e0;
+  --navbar-height: 76px;
+  --navbar-height-scrolled: 68px;
 }
 
 * {
