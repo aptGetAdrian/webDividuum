@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine as build
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
@@ -16,11 +16,11 @@ COPY . .
 # Build the project
 RUN npm run build
 
+# Install serve package globally
+RUN npm install -g serve
 
-FROM nginx:alpine
+# Expose port for production
+EXPOSE 3000
 
-COPY --from=build /app/dist /usr/share/nginx/html
-
-EXPOSE 5175
-
-CMD ["nginx", "-g", "daemon off;"] 
+# Start the production server
+CMD ["serve", "-s", "dist", "-l", "3000"]

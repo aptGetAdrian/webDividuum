@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import './Hero.css';
 import './FeaturedGuests.css';
 
@@ -9,6 +10,8 @@ const CHANNEL_ID = 'UCOgRR3LGKA2VIqbgmIer9JQ';
 const Episodes = () => {
   const [episodes, setEpisodes] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useDocumentTitle('Individuum epizode');
 
   useEffect(() => {
     const fetchEpisodes = async () => {

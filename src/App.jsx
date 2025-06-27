@@ -6,6 +6,8 @@ import Footer from './components/Footer';
 import './index.css';
 import Hosts from './components/Hosts';
 import Episodes from './components/Episodes';
+import Contact from './components/Contact';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
@@ -16,14 +18,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/o-nama" element={<Hosts />} />
           <Route path="/epizode" element={<Episodes/>} />
-          <Route path="/podpora" element={
-            <div className="coming-soon section">
-              <div className="container">
-                <h1>Podpora projekta</h1>
-                <p>Coming soon...</p>
-              </div>
-            </div>
-          } />
+          <Route path="/podpora" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </div>

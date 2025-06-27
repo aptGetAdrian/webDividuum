@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5175:5175"
+      - "3000:3000"
     environment:
-      VITE_BACKEND_URL: "http://backend:8080" 
-    restart: on-failure
+      NODE_ENV: production
+    restart: unless-stopped

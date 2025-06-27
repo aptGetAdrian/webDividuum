@@ -1,13 +1,16 @@
 import { motion } from 'framer-motion';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 import './Hosts.css';
 
 const Hosts = () => {
+  useDocumentTitle('O podkastu');
+  
   return (
     <section className="hosts section" style={{ marginTop: '8vh' }}>
       <div className="container">
         <motion.div 
           className="podcast-description"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
@@ -19,7 +22,7 @@ const Hosts = () => {
 
         <motion.div 
           className="host-section"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
@@ -45,7 +48,7 @@ const Hosts = () => {
 
         <motion.div 
           className="host-section reverse"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >

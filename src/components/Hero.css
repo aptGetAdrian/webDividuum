@@ -7,6 +7,8 @@
   display: flex;
   align-items: center;
   padding-top: 70px;
+  overflow: visible;
+  z-index: 2;
 }
 
 .hero-overlay {
@@ -297,21 +299,12 @@
   align-items: center;
   overflow: hidden;
   z-index: 1;
+  background-color: #0a1f26;
+  margin-top: -2px;
 }
 
 .hero-background-video-second {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -3;
-}
-
-.background-image-second {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  display: none;
 }
 
 .hero-overlay-second {
@@ -322,8 +315,8 @@
   bottom: 0;
   background: linear-gradient(
     to right,
-    rgba(14, 14, 14, 0.8),
-    rgba(14, 14, 14, 0.8)
+    rgba(10, 31, 38, 0.3),
+    rgba(14, 14, 14, 0.2)
   );
   z-index: -2;
 }

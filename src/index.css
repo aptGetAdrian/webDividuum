@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'); 
+
 :root {
   --primary-color: #1a4b5c;
   --secondary-color: #2a7185;
@@ -71,4 +73,3 @@ body {
   font-size: 1.2rem;
   color: var(--text-secondary);
 } 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'); 
