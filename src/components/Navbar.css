@@ -105,7 +105,7 @@
 
   .nav-links {
     position: fixed;
-    top: var(--navbar-height, 76px);
+    top: 8vh;
     right: -100%;
     flex-direction: column;
     background-color: rgba(10, 31, 38, 0.98);
@@ -113,7 +113,7 @@
     width: 100%;
     text-align: center;
     padding: 2.5rem 0;
-    transition: right 0.3s ease, top 0.3s ease;
+    transition: right 0.3s ease;
     gap: 2.5rem;
     margin: 0;
     max-width: none;
@@ -125,7 +125,7 @@
   }
 
   .navbar.scrolled .nav-links {
-    top: var(--navbar-height-scrolled, 68px);
+    top: 7vh;
   }
 
   .hamburger.active span:nth-child(1) {

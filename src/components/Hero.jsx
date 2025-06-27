@@ -9,6 +9,7 @@ const Hero = () => {
   const [videoData, setVideoData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showVideo, setShowVideo] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const glitch = useGlitch({
     playMode: 'hover',
     timing: { duration: 550, iterations: 1 },
@@ -99,22 +100,35 @@ const Hero = () => {
     setShowVideo(true);
   };
 
+  const handleVideoError = () => {
+    setVideoError(true);
+  };
+
   return (
     <>
 
 
     <section className="hero">
-      {/* Background Video */}
+      {/* Background Video or Fallback Image */}
       <div className="hero-background-video">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="background-video"
-        >
-          <source src="/assets/videoplayback_1.webm" type="video/mp4" />
-        </video>
+        {!videoError ? (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="background-video"
+            onError={handleVideoError}
+          >
+            <source src="/assets/videoplayback_1.webm" type="video/mp4" />
+          </video>
+        ) : (
+          <img 
+            src="/assets/videoplayback.00_15_09_07.Still001.png"
+            alt="Background"
+            className="background-video"
+          />
+        )}
       </div>
       
       {/* Film Grain Overlay */}

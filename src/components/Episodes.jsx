@@ -79,7 +79,7 @@ const Episodes = () => {
       transition={{ duration: 0.5 }}
       style={{ minHeight: '100vh', background: 'none', marginTop: '100px', marginBottom: '100px' }}
     >
-      <div className="container hero-content" style={{ flexDirection: 'column', alignItems: 'center' }}>
+      <div className="container hero-content" style={{ flexDirection: 'column', alignItems: 'center', padding: '0 20px' }}>
         <motion.h2
           className="section-title"
           initial={{ opacity: 0, y: 20 }}
@@ -133,7 +133,15 @@ const Episodes = () => {
             </h2>
           </motion.div>
         ) : (
-          <div style={{ width: '100%', maxWidth: '1500px', display: 'flex', flexWrap: 'wrap', gap: '2.6rem', justifyContent: 'center' }}>
+          <div style={{ 
+            width: '100%', 
+            maxWidth: '1500px', 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            gap: '2.6rem', 
+            justifyContent: 'center',
+            margin: '0 auto'
+          }}>
             {episodes.map((episode, index) => (
               <motion.a
                 key={episode.id}
@@ -156,7 +164,8 @@ const Episodes = () => {
                   scale: 1.03
                 }}
                 style={{
-                  width: '350px',
+                  width: '100%',
+                  maxWidth: '350px',
                   background: 'rgba(20, 20, 20, 0.95)',
                   borderRadius: '16px',
                   overflow: 'hidden',
