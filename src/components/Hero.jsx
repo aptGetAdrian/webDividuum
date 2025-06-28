@@ -119,8 +119,22 @@ const Hero = () => {
             playsInline
             className="background-video"
             onError={handleVideoError}
+            preload="auto"
           >
-            <source src="/assets/videoplayback_1.webm" type="video/mp4" />
+            <source 
+              src="/assets/videoplayback_1.mp4" 
+              type="video/mp4" 
+              media="all and (min-width: 768px)"
+            />
+            <source 
+              src="/assets/videoplayback_1_mobile.mp4" 
+              type="video/mp4" 
+              media="all and (max-width: 767px)"
+            />
+            <source 
+              src="/assets/videoplayback_1.webm" 
+              type="video/webm"
+            />
           </video>
         ) : (
           <img 
