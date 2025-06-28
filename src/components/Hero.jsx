@@ -112,17 +112,18 @@ const Hero = () => {
       {/* Background Video or Fallback Image */}
       <div className="hero-background-video">
         {!videoError ? (
-          <video
+          <video       // standard
             autoPlay
             muted
             loop
             playsInline
+            webkit-playsinline
+            preload="auto"
             className="background-video"
             onError={handleVideoError}
-            preload="auto"
           >
             <source 
-              src="/assets/videoplayback_1.mp4" 
+              src="/assets/output.mp4" 
               type="video/mp4" 
               media="all and (min-width: 768px)"
             />
