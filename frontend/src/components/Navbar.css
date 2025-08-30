@@ -1,0 +1,144 @@
+.navbar {
+  background-color: rgba(10, 31, 38, 0.2); /* 80% transparent initially */
+  backdrop-filter: blur(10px);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  padding: 1.5rem 0; /* Increased padding */
+  transition: all 0.3s ease; /* Smooth transition */
+  box-shadow: none; /* No shadow initially */
+  height: 5rem; /* Add explicit height */
+}
+
+.navbar.scrolled {
+  background-color: rgba(10, 31, 38, 0.95); /* Original opacity when scrolled */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Drop shadow when scrolled */
+  padding: 1.2rem 0; /* Slightly reduced when scrolled for a nice effect */
+  height: 4.5rem; /* Add explicit height for scrolled state */
+}
+
+.nav-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4.5rem; /* Increased gap between links */
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.nav-links a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1.1rem; /* Increased font size */
+  font-weight: 600; /* Made text bolder */
+  letter-spacing: 0.5px; /* Added letter spacing */
+  text-transform: uppercase; /* Made text uppercase */
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Added subtle text shadow */
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; /* Slightly lowered the underline */
+  left: 0;
+  width: 0;
+  height: 2.5px; /* Made underline slightly thicker */
+  background-color: var(--accent-color);
+  transition: width 0.3s ease;
+  border-radius: 2px; /* Rounded the underline edges */
+}
+
+.nav-links a:hover {
+  color: var(--accent-color);
+  transform: translateY(-1px); /* Slight lift effect on hover */
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.nav-links div {
+  display: inline-block;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  position: absolute;
+  right: 2rem;
+}
+
+.hamburger span {
+  width: 30px; /* Made hamburger slightly bigger */
+  height: 2.5px; /* Made lines slightly thicker */
+  background-color: var(--text-color);
+  transition: all 0.3s ease;
+  border-radius: 2px; /* Rounded the edges of hamburger lines */
+}
+
+
+@media (max-width: 768px) {
+  .nav-container {
+    justify-content: flex-end;
+    height: 100%;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 8vh;
+    right: -100%;
+    flex-direction: column;
+    background-color: rgba(10, 31, 38, 0.98);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    text-align: center;
+    padding: 2.5rem 0;
+    transition: right 0.3s ease;
+    gap: 2.5rem;
+    margin: 0;
+    max-width: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .nav-links.active {
+    right: 0;
+    width: 100%;
+  }
+
+  .navbar.scrolled .nav-links {
+    top: 7vh;
+  }
+
+  .hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(9px, 7px);
+  }
+
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -6px);
+  }
+}
