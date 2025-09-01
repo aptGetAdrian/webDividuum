@@ -8,7 +8,7 @@ cleanej up CSS datoteke. mislim, da so tudi ene unused jsx datoteke
 ove kartice porihtej, ko boš doba slike. naredi tebe pa ovega drugega samo kak kartici. 
 ne zdi se mi vredno opisa
 
-wallpaper z ovimi fingerprinti
+wallpaper z ovimi fingerprinti, probej uprabiti to, kej ti patrik pošle
 
 ša tisti fingerprint v navbari, ko je v mobile, naredi, ka de od zacetka sla crtica
 

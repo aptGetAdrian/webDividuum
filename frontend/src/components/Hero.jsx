@@ -14,10 +14,16 @@ const Hero = () => {
   const [showSecondImage, setShowSecondImage] = useState(false);
   const [lastScrollTime, setLastScrollTime] = useState(0);
   const [apiError, setApiError] = useState(null);
+  
+  // New state for video loading
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+  
   const heroRef = useRef(null);
+  const videoRef = useRef(null);
 
   const glitch = useGlitch({
-    playMode: 'manual', // Changed from 'hover' to 'manual' for mobile control
+    playMode: 'manual',
     timing: { duration: 550, iterations: 1 },
     glitchTimeSpan: { start: 0, end: 1 },
     shake: { velocity: 12, amplitudeX: 0.2, amplitudeY: 0.19 },
@@ -37,6 +43,23 @@ const Hero = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Handle video loading
+  const handleVideoLoaded = () => {
+    setVideoLoaded(true);
+    // Small delay to ensure smooth transition
+    setTimeout(() => {
+      setShowContent(true);
+    }, 200);
+  };
+
+  const handleVideoError = () => {
+    setVideoError(true);
+    setVideoLoaded(true); // Show content even if video fails
+    setTimeout(() => {
+      setShowContent(true);
+    }, 200);
+  };
+
   // Custom hook to detect scroll
   const useScrollDetection = () => {
     useEffect(() => {
@@ -46,8 +69,7 @@ const Hero = () => {
         const currentTime = Date.now();
         const timeSinceLastScroll = currentTime - lastScrollTime;
 
-        // Only trigger if enough time has passed since last scroll trigger (throttling)
-        if (timeSinceLastScroll > 50) { // 50ms throttle
+        if (timeSinceLastScroll > 50) {
           setLastScrollTime(currentTime);
           triggerGlitchAnimation();
         }
@@ -61,10 +83,8 @@ const Hero = () => {
 
   // Function to trigger the glitch animation
   const triggerGlitchAnimation = () => {
-    // Start the glitch effect
     glitch.startGlitch();
 
-    // Create the back-and-forth switching effect
     let switchCount = 0;
     const switchInterval = setInterval(() => {
       setShowSecondImage(prev => !prev);
@@ -72,19 +92,17 @@ const Hero = () => {
 
       if (switchCount >= 8) {
         clearInterval(switchInterval);
-        // Reset to first image
         setShowSecondImage(false);
       }
-    }, 70); // Switch every 70ms for fast back-and-forth effect
+    }, 70);
 
     setTimeout(() => {
       glitch.stopGlitch();
       clearInterval(switchInterval);
-      setShowSecondImage(false); // Ensure we end on the first image
-    }, 200); // Match the duration from glitch config
+      setShowSecondImage(false);
+    }, 200);
   };
 
-  // Use the scroll detection hook
   useScrollDetection();
 
   useEffect(() => {
@@ -93,15 +111,14 @@ const Hero = () => {
         setLoading(true);
         setApiError(null);
 
-        // Make request to backend API
         const response = await fetch('http://localhost:5000/api/latest-video');
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.error) {
           throw new Error(data.error);
         }
@@ -110,7 +127,6 @@ const Hero = () => {
           setLatestVideoId(data.videoId);
           setVideoData(data.videoData);
         } else {
-          // Use fallback if no video found
           console.warn('No latest video found, using fallback');
         }
       } catch (error) {
@@ -128,16 +144,11 @@ const Hero = () => {
     setShowVideo(true);
   };
 
-  const handleVideoError = () => {
-    setVideoError(true);
-  };
-
   // Desktop hover handlers
   const handleMouseEnter = () => {
     if (!isMobile) {
       glitch.startGlitch();
 
-      // Create back-and-forth effect for desktop hover too
       let switchCount = 0;
       const switchInterval = setInterval(() => {
         setShowSecondImage(prev => !prev);
@@ -145,13 +156,13 @@ const Hero = () => {
 
         if (switchCount >= 8) {
           clearInterval(switchInterval);
-          setShowSecondImage(true); // End on second image for hover
+          setShowSecondImage(true);
         }
       }, 70);
 
       setTimeout(() => {
         clearInterval(switchInterval);
-        setShowSecondImage(true); // Show second image on hover
+        setShowSecondImage(true);
       }, 550);
     }
   };
@@ -159,46 +170,107 @@ const Hero = () => {
   const handleMouseLeave = () => {
     if (!isMobile) {
       glitch.stopGlitch();
-      setShowSecondImage(false); // Return to first image when not hovering
+      setShowSecondImage(false);
     }
   };
 
   return (
     <>
       <style jsx>{`
-        .hero-banner-image {
-          transition: opacity 0.1s ease;
-        }
-        
-        .swap-banner-image {
-          opacity: 1;
-        }
-        
-        .swap-banner-image.hidden {
-          opacity: 0;
-        }
-        
-        .hover-banner {
-          opacity: 0;
-        }
-        
-        .hover-banner.visible {
-          opacity: 1;
-        }
+      .hero-banner-image {
+        transition: opacity 0.1s ease;
+      }
+      
+      .swap-banner-image {
+        opacity: 1;
+      }
+      
+      .swap-banner-image.hidden {
+        opacity: 0;
+      }
+      
+      .hover-banner {
+        opacity: 0;
+      }
+      
+      .hover-banner.visible {
+        opacity: 1;
+      }
 
-        /* Mobile-specific styling to disable hover effects */
-        @media (max-width: 768px) {
-          .banner-image-wrapper:hover .hero-banner-image {
-            /* Override any hover effects on mobile */
-          }
+      /* Loading screen styles */
+      .video-loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      }
+
+      .video-loading-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top: 3px solid #ffffff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      .loading-text {
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        opacity: 0.8;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Hero content animation */
+      .hero-content-wrapper {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      }
+
+      .hero-content-wrapper.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 768px) {
+        .banner-image-wrapper:hover .hero-banner-image {
+          /* Override any hover effects on mobile */
         }
-      `}</style>
+      }
+    `}</style>
+
+      {/* Video Loading Screen */}
+      <div className={`video-loading-screen ${showContent ? 'hidden' : ''}`}>
+        <div className="loading-spinner"></div>
+        <div className="loading-text">Loading...</div>
+      </div>
 
       <section className="hero" ref={heroRef}>
         {/* Background Video or Fallback Image */}
         <div className="hero-background-video">
           {!videoError ? (
-            <video       // standard
+            <video
+              ref={videoRef}
               autoPlay
               muted
               loop
@@ -206,28 +278,44 @@ const Hero = () => {
               webkit-playsinline="true"
               preload="auto"
               className="background-video"
+              onLoadedData={handleVideoLoaded}
+              onCanPlayThrough={handleVideoLoaded}
               onError={handleVideoError}
+              key={isMobile ? 'mobile' : 'desktop'}
             >
-              <source
-                src="/assets/output.mp4"
-                type="video/mp4"
-                media="all and (min-width: 768px)"
-              />
-              <source
-                src="/assets/videoplayback_1_mobile.mp4"
-                type="video/mp4"
-                media="all and (max-width: 767px)"
-              />
-              <source
-                src="/assets/videoplayback_1.webm"
-                type="video/webm"
-              />
+              {isMobile ? (
+                // Mobile video sources
+                <>
+                  <source
+                    src="/assets/mobile-video.mp4"
+                    type="video/mp4"
+                  />
+                  <source
+                    src="/assets/videoplayback_1_mobile.webm"
+                    type="video/webm"
+                  />
+                </>
+              ) : (
+                // Desktop video sources
+                <>
+                  <source
+                    src="/assets/desktop-video.mp4"
+                    type="video/mp4"
+                  />
+                  <source
+                    src="/assets/videoplayback_1.webm"
+                    type="video/webm"
+                  />
+                </>
+              )}
             </video>
           ) : (
             <img
               src="/assets/videoplayback.00_15_09_07.Still001.png"
               alt="Background"
               className="background-video"
+              onLoad={handleVideoLoaded}
+              onError={handleVideoError}
             />
           )}
         </div>
@@ -238,12 +326,12 @@ const Hero = () => {
         {/* Dark Overlay */}
         <div className="hero-overlay"></div>
 
-        <div className="container hero-content">
+        <div className={`container hero-content hero-content-wrapper ${showContent ? 'visible' : ''}`}>
           <motion.div
             className="hero-text"
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: showContent ? 0.3 : 0 }}
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '150%', minHeight: '350px', paddingTop: '40px' }}
           >
             <div className="banner-image-wrapper" style={{ width: '150%', maxWidth: '1800px', margin: '0 auto', display: 'block', position: 'relative' }}>
@@ -275,7 +363,7 @@ const Hero = () => {
         </div>
       </section>
 
-      <section className="hero-second">
+      <section className={`hero-second hero-content-wrapper ${showContent ? 'visible' : ''}`}>
         <div className="hero-background-video-second">
           <img
             src="/assets/backgroundimaheM.png"
@@ -295,10 +383,14 @@ const Hero = () => {
               y: 30,
               scale: 0.95
             }}
-            whileInView={{
+            whileInView={showContent ? {
               opacity: 1,
               y: 0,
               scale: 1
+            } : {
+              opacity: 0,
+              y: 30,
+              scale: 0.95
             }}
             transition={{
               duration: 0.8,
@@ -308,16 +400,16 @@ const Hero = () => {
           >
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              whileInView={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: showContent ? 0.2 : 0 }}
               viewport={{ once: true }}
             >
               INDIVIDUUM PODKAST
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              whileInView={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: showContent ? 0.3 : 0 }}
               viewport={{ once: true }}
             >
               Raziskujemo zgodbe, delimo znanje in povezujemo ljudi
@@ -327,8 +419,8 @@ const Hero = () => {
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              whileInView={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: showContent ? 0.4 : 0 }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
@@ -343,13 +435,16 @@ const Hero = () => {
               opacity: 0,
               y: 30
             }}
-            whileInView={{
+            whileInView={showContent ? {
               opacity: 1,
               y: 0
+            } : {
+              opacity: 0,
+              y: 30
             }}
             transition={{
               duration: 0.6,
-              delay: 0.3,
+              delay: showContent ? 0.3 : 0,
               ease: "easeOut"
             }}
             viewport={{ once: true }}
@@ -360,7 +455,7 @@ const Hero = () => {
                   {apiError ? (
                     <div style={{ color: '#ff6b6b', textAlign: 'center' }}>
                       <p>{apiError}</p>
-                      <button 
+                      <button
                         onClick={() => window.location.reload()}
                         style={{
                           padding: '0.5rem 1rem',
@@ -400,7 +495,6 @@ const Hero = () => {
                       <path d="M8 5v14l11-7z" />
                     </svg>
                   </div>
-                  {/* Added mobile-video-info class for desktop only */}
                   {videoData && (
                     <div className="video-info-overlay-second mobile-video-info">
                       <h3 className="video-title-second">{videoData.title}</h3>
