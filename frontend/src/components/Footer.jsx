@@ -1,9 +1,10 @@
-import { FaSpotify, FaYoutube, FaApple } from 'react-icons/fa';
+import { FaSpotify, FaYoutube, FaApple, FaTiktok, FaFacebook } from 'react-icons/fa';
+import React from 'react';
 import { motion } from 'framer-motion';
 import './Footer.css';
 
 const Footer = () => {
-  const platforms = [
+  const primaryPlatforms = [
     {
       name: 'Spotify',
       icon: <FaSpotify />,
@@ -24,6 +25,21 @@ const Footer = () => {
     }
   ];
 
+  const socialPlatforms = [
+    {
+      name: 'TikTok',
+      icon: <FaTiktok />,
+      link: 'https://www.tiktok.com/@individuum.podcast',
+      color: '#ff0050'
+    },
+    {
+      name: 'Facebook',
+      icon: <FaFacebook />,
+      link: 'https://www.facebook.com/profile.php?id=61566305171608',
+      color: '#1877F2'
+    }
+  ];
+
   // Add your website pages here
   const sitePages = [
     { name: 'Domov', path: '/' },
@@ -40,53 +56,110 @@ const Footer = () => {
           {/* Platform links section */}
           <div className="footer-section">
             <h3 className="footer-heading">Poslušaj nas</h3>
-            <div className="platforms">
-              {platforms.map((platform) => (
-                <motion.a
-                  key={platform.name}
-                  href={platform.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="platform-link"
-                  style={{ '--platform-color': platform.color }}
-                  initial={{ 
-                    opacity: 0, 
-                    y: 30,
-                    scale: 0.9
-                  }}
-                  whileInView={{ 
-                    opacity: 1, 
-                    y: 0,
-                    scale: 1
-                  }}
-                  transition={{   
-                    duration: 0.8,   
-                  }}
-                  viewport={{ 
-                    once: true,
-                  }}
-                  whileHover={{
-                    scale: 1.05,
-                    transition: { duration: 0.05 }
-                  }}
-                  whileTap={{
-                    scale: 0.98,
-                    transition: { duration: 0.1 }
-                  }}
-                >
-                  <span className="platform-icon">{platform.icon}</span>
-                  <span className="platform-name">{platform.name}</span>
-                </motion.a>
-              ))}
+            <div className="platforms-container">
+              {/* Primary platforms row */}
+              <div className="platforms platforms-primary">
+                {primaryPlatforms.map((platform) => (
+                  <motion.a
+                    key={platform.name}
+                    href={platform.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="platform-link"
+                    style={{ '--platform-color': platform.color }}
+                    initial={{
+                      opacity: 0,
+                      y: 30,
+                      scale: 0.9
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      y: 0,
+                      scale: 1
+                    }}
+                    transition={{
+                      duration: 0.8,
+                    }}
+                    viewport={{
+                      once: true,
+                    }}
+                    whileHover={{
+                      scale: 1.05,
+                      transition: { duration: 0.05 }
+                    }}
+                    whileTap={{
+                      scale: 0.98,
+                      transition: { duration: 0.1 }
+                    }}
+                    animate={{
+                      scale: 1,
+                      transition: {
+                        duration: 0.05,
+                      }
+                    }}
+                  >
+                    <span className="platform-icon">{platform.icon}</span>
+                    <span className="platform-name">{platform.name}</span>
+                  </motion.a>
+                ))}
+              </div>
+
+              {/* Social platforms row */}
+              <div className="platforms platforms-social">
+                {socialPlatforms.map((platform, index) => (
+                  <motion.a
+                    key={platform.name}
+                    href={platform.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="platform-link-social"
+                    initial={{
+                      opacity: 0,
+                      y: 30,
+                      scale: 0.9
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      y: 0,
+                      scale: 1
+                    }}
+                    transition={{
+                      duration: 0.8,
+                      delay: 0.1 * (index + 1)
+                    }}
+                    viewport={{
+                      once: true,
+                    }}
+                    whileHover={{
+                      scale: 1.05,
+                      transition: { duration: 0.05 }
+                    }}
+                    whileTap={{
+                      scale: 0.98,
+                      transition: { duration: 0.1 }
+                    }}
+
+                    style={{
+                      '--platform-color': platform.color,
+                      '--icon-size': '3rem'
+                    }}
+                  >
+                    {React.cloneElement(platform.icon, {
+                      className: 'platform-icon-social'
+                    })}
+                    <span className="platform-name">{platform.name}</span>
+                  </motion.a>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Site navigation section */}
-          <motion.div 
+          <motion.div
             className="footer-section"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut"}}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true }}
           >
             <h3 className="footer-heading">Navigacija</h3>
@@ -107,8 +180,8 @@ const Footer = () => {
             </nav>
           </motion.div>
         </div>
-        
-        <motion.div 
+
+        <motion.div
           className="footer-bottom"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

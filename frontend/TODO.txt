@@ -12,9 +12,6 @@ wallpaper z ovimi fingerprinti
 
 ša tisti fingerprint v navbari, ko je v mobile, naredi, ka de od zacetka sla crtica
 
-spodi dodej za facebook pa tiktok
-
 BACKEND:
-novi github, ker so api keys exposed
 
 za deployment pogledni app engine od googla. ali pa lowkey samo google cloud functions. ker like, to bota dve funkciji brah
