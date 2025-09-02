@@ -54,11 +54,7 @@
 
 .platforms-social {
   justify-content: center;
-<<<<<<< HEAD
   gap: 2rem; 
-=======
-  gap: 2rem;
->>>>>>> 64a659d (fourth commit)
 }
 
 .platform-link {
@@ -112,11 +108,7 @@
   font-size: 2rem;
   color: var(--platform-color);
   line-height: 1;
-<<<<<<< HEAD
 } 
-=======
-}
->>>>>>> 64a659d (fourth commit)
 
 .platform-icon {
   font-size: 3rem;
@@ -230,7 +222,6 @@
     font-size: 2rem;
     margin-bottom: 0;
   }
-<<<<<<< HEAD
 }
 
 @media (max-width: 480px) {
@@ -246,33 +237,10 @@
     margin-bottom: 2rem;
   }
   
-  .platform-link {
-    padding: 0.75rem;
-    flex-direction: column;
-  }
-
-  .platform-link-social {
-    padding: 0.75rem;
-    flex-direction: column;
-  }
-  
-  .platform-icon {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .platform-icon-social {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
-  }
-  
   .footer-main {
     gap: 1.5rem;
     margin-bottom: 2rem;
   }
-}
-=======
-
   .footer-nav {
     align-items: center;
   }
@@ -281,4 +249,5 @@
     text-align: center;
   }
 }
->>>>>>> 64a659d (fourth commit)
+
+  

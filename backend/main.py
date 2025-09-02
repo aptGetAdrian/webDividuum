@@ -4,9 +4,6 @@ import requests
 import os
 from dotenv import load_dotenv
 import logging
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 # Load environment variables
 load_dotenv()
@@ -377,85 +374,6 @@ def get_latest_video():
             'videoData': None
         }), 500
 
-@app.route('/api/send-email', methods=['POST'])
-def send_email():
-    """Send contact form email via SMTP"""
-    try:
-        # Get form data from request
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-        
-        name = data.get('name', '').strip()
-        subject = data.get('subject', '').strip()
-        message = data.get('message', '').strip()
-        
-        # Validate required fields
-        if not name or not subject or not message:
-            return jsonify({'error': 'All fields are required'}), 400
-        
-        # Check if SMTP is configured
-        if not SMTP_SERVER or not SMTP_USERNAME or not SMTP_PASSWORD:
-            logger.error("SMTP configuration missing")
-            return jsonify({'error': 'Email service not configured'}), 500
-        
-        logger.info(f"Sending email via SMTP for: {name}")
-        return send_via_smtp(name, subject, message)
-            
-    except Exception as e:
-        logger.error(f"Error in send_email: {e}")
-        return jsonify({'error': 'Failed to send email'}), 500
-
-def send_via_smtp(name, subject, message):
-    """Send email using SMTP"""
-    try:
-        # Create message
-        msg = MIMEMultipart()
-        msg['From'] = SMTP_USERNAME
-        msg['To'] = TO_EMAIL
-        msg['Subject'] = f"Contact Form: {subject}"
-        
-        # Email body
-        body = f"""
-New contact form submission from website:
-
-Name: {name}
-Subject: {subject}
-
-Message:
-{message}
-
----
-Sent via Individuum Podcast website contact form
-        """
-        
-        msg.attach(MIMEText(body, 'plain'))
-        
-        # Send email
-        logger.info(f"Connecting to SMTP server: {SMTP_SERVER}:{SMTP_PORT}")
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
-        server.login(SMTP_USERNAME, SMTP_PASSWORD)
-        
-        # Send the email
-        text = msg.as_string()
-        server.sendmail(SMTP_USERNAME, TO_EMAIL, text)
-        server.quit()
-        
-        logger.info(f"Email sent successfully via SMTP for: {name}")
-        return jsonify({
-            'success': True,
-            'message': 'Sporočilo uspešno poslano! Hvala za vaše sporočilo.'
-        })
-        
-    except smtplib.SMTPException as e:
-        logger.error(f"SMTP error: {e}")
-        return jsonify({'error': f'Failed to send email: {str(e)}'}), 500
-    except Exception as e:
-        logger.error(f"SMTP general error: {e}")
-        return jsonify({'error': 'Email service error'}), 500
-
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -469,18 +387,21 @@ def not_found(error):
 def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
-if __name__ == '__main__':
-    # Check if required environment variables are set
-    if not YOUTUBE_API_KEY:
-        logger.error("YOUTUBE_API_KEY is required")
-        exit(1)
-    
-    logger.info("Starting YouTube API server...")
-    logger.info(f"Using Channel ID: {CHANNEL_ID}")
-    
-    # Run the app
-    app.run(
-        host=os.getenv('HOST', '127.0.0.1'),
-        port=int(os.getenv('PORT', 5000)),
-        debug=os.getenv('DEBUG', 'False').lower() == 'true'
-    )
+def my_api(request):
+    """Entrypoint for Google Cloud Functions"""
+    return app(request.environ, lambda status, headers: (status, headers, []))
+# if __name__ == '__main__':
+#     # Check if required environment variables are set
+#     if not YOUTUBE_API_KEY:
+#         logger.error("YOUTUBE_API_KEY is required")
+#         exit(1)
+#     
+#     logger.info("Starting YouTube API server...")
+#     logger.info(f"Using Channel ID: {CHANNEL_ID}")
+#     
+#     # Run the app
+#     app.run(
+#         host=os.getenv('HOST', '127.0.0.1'),
+#         port=int(os.getenv('PORT', 5000)),
+#         debug=os.getenv('DEBUG', 'False').lower() == 'true'
+#     )
