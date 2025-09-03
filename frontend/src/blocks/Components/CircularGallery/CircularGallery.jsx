@@ -32,164 +32,48 @@ function autoBind(instance) {
   });
 }
 
-function createTextTexture(
-  gl,
-  text,
-  font = "30px Figtree",
-  color = "black",
-) {
-  console.log(text);
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d");
-  context.font = font;
-  const metrics = context.measureText(text);
-  const textWidth = Math.ceil(metrics.width);
-  const textHeight = Math.ceil(parseInt(font, 10) * 1.2);
-  canvas.width = textWidth + 20;
-  canvas.height = textHeight + 20;
-  context.font = "bold 30px Figtree"; //TU SE SPREMENI TEXT
-  context.fillStyle = color;
-  context.textBaseline = "middle";
-  context.textAlign = "center";
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillText(text, canvas.width / 2, canvas.height / 2);
-  const texture = new Texture(gl, { generateMipmaps: false });
-  texture.image = canvas;
-  return { texture, width: canvas.width, height: canvas.height };
-}
-
-class TextOverlay {
-  constructor({
-    gl,
-    plane,
-    renderer,
-    text,
-    textColor = "white",
-    font = "bold 30px sans-serif"
-  }) {
-    autoBind(this);
-    this.gl = gl;
-    this.plane = plane;
-    this.renderer = renderer;
-    this.text = text;
-    this.textColor = textColor;
-    this.font = font;
-    this.opacity = 0;
-    this.targetOpacity = 0;
-    this.createMesh();
-  }
-  
-  createMesh() {
-    const { texture, width, height } = createTextTexture(
-      this.gl,
-      this.text,
-      this.font,
-      this.textColor,
-    );
-    const geometry = new Plane(this.gl);
-    const program = new Program(this.gl, {
-      vertex: `
-        attribute vec3 position;
-        attribute vec2 uv;
-        uniform mat4 modelViewMatrix;
-        uniform mat4 projectionMatrix;
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragment: `
-        precision highp float;
-        uniform sampler2D tMap;
-        uniform float uOpacity;
-        varying vec2 vUv;
-        void main() {
-          vec4 color = texture2D(tMap, vUv);
-          if (color.a < 0.1) discard;
-          gl_FragColor = vec4(color.rgb, color.a * uOpacity);
-        }
-      `,
-      uniforms: { 
-        tMap: { value: texture },
-        uOpacity: { value: 0 }
-      },
-      transparent: true,
-    });
-    this.mesh = new Mesh(this.gl, { geometry, program });
-    
-    const aspect = width / height;
-    const textHeight = this.plane.scale.y * 0.2;
-    const textWidth = textHeight * aspect;
-    
-    this.mesh.scale.set(textWidth, textHeight, 1);
-    
-    // Position the text overlay
-    // Here we need to position the text above the main plane
-    // Let's place it at the top of the image
-    const yOffset = this.plane.scale.y / 2 - textHeight / 2 - 0.1; // 0.1 is a small margin
-    this.mesh.position.set(0, yOffset, 0.01); // Slightly in front of the image
-    
-    this.mesh.setParent(this.plane);
-  }
-  
-  show() {
-    this.targetOpacity = 1;
-  }
-  
-  hide() {
-    this.targetOpacity = 0;
-  }
-  
-  update() {
-    this.opacity = lerp(this.opacity, this.targetOpacity, 0.1);
-    this.mesh.program.uniforms.uOpacity.value = this.opacity;
-  }
-}
-
 class Media {
   constructor({
     geometry,
     gl,
     image,
+    description,
+    link,
     index,
     length,
     renderer,
     scene,
     screen,
-    text,
     viewport,
     bend,
-    textColor,
     borderRadius = 0,
-    font,
+    onClick,
   }) {
     this.extra = 0;
     this.geometry = geometry;
     this.gl = gl;
     this.image = image;
+    this.description = description;
+    this.link = link;
     this.index = index;
     this.length = length;
     this.renderer = renderer;
     this.scene = scene;
     this.screen = screen;
-    this.text = text;
     this.viewport = viewport;
     this.bend = bend;
-    this.textColor = textColor;
     this.borderRadius = borderRadius;
-    this.font = font;
     this.isHovered = false;
-    this.dimAmount = 0;
-    this.targetDimAmount = 0;
+    this.onClick = onClick;
     this.createShader();
     this.createMesh();
-    this.createTextOverlay();
     this.onResize();
   }
   
   createShader() {
-    const texture = new Texture(this.gl, { generateMipmaps: false });
+    this.mainTexture = new Texture(this.gl, { generateMipmaps: false });
+    this.descriptionTexture = new Texture(this.gl, { generateMipmaps: false });
+    
     this.program = new Program(this.gl, {
       depthTest: false,
       depthWrite: false,
@@ -211,9 +95,10 @@ class Media {
         precision highp float;
         uniform vec2 uImageSizes;
         uniform vec2 uPlaneSizes;
-        uniform sampler2D tMap;
+        uniform sampler2D tMainMap;
+        uniform sampler2D tDescriptionMap;
         uniform float uBorderRadius;
-        uniform float uDimAmount;
+        uniform float uHoverAmount;
         varying vec2 vUv;
         
         float roundedBoxSDF(vec2 p, vec2 b, float r) {
@@ -230,38 +115,52 @@ class Media {
             vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
             vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
           );
-          vec4 color = texture2D(tMap, uv);
+          
+          vec4 mainColor = texture2D(tMainMap, uv);
+          vec4 descriptionColor = texture2D(tDescriptionMap, uv);
+          vec4 color = mix(mainColor, descriptionColor, uHoverAmount);
           
           float d = roundedBoxSDF(vUv - 0.5, vec2(0.5 - uBorderRadius), uBorderRadius);
           if(d > 0.0) {
             discard;
           }
           
-          // Apply dimming effect
-          color.rgb = mix(color.rgb, color.rgb * 0.3, uDimAmount);
-          
           gl_FragColor = vec4(color.rgb, 1.0);
         }
       `,
       uniforms: {
-        tMap: { value: texture },
+        tMainMap: { value: this.mainTexture },
+        tDescriptionMap: { value: this.descriptionTexture },
         uPlaneSizes: { value: [0, 0] },
         uImageSizes: { value: [0, 0] },
         uBorderRadius: { value: this.borderRadius },
-        uDimAmount: { value: 0 },
+        uHoverAmount: { value: 0 },
       },
       transparent: true,
     });
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = this.image;
-    img.onload = () => {
-      texture.image = img;
+    
+    // Load main image
+    const mainImg = new Image();
+    mainImg.crossOrigin = "anonymous";
+    mainImg.src = this.image;
+    mainImg.onload = () => {
+      this.mainTexture.image = mainImg;
       this.program.uniforms.uImageSizes.value = [
-        img.naturalWidth,
-        img.naturalHeight,
+        mainImg.naturalWidth,
+        mainImg.naturalHeight,
       ];
     };
+    
+    // Load description image
+    const descImg = new Image();
+    descImg.crossOrigin = "anonymous";
+    descImg.src = this.description;
+    descImg.onload = () => {
+      this.descriptionTexture.image = descImg;
+    };
+    
+    this.hoverAmount = 0;
+    this.targetHoverAmount = 0;
   }
   
   createMesh() {
@@ -272,25 +171,9 @@ class Media {
     this.plane.setParent(this.scene);
   }
   
-  createTextOverlay() {
-    this.textOverlay = new TextOverlay({
-      gl: this.gl,
-      plane: this.plane,
-      renderer: this.renderer,
-      text: this.text,
-      textColor: this.textColor,
-      font: this.font,
-    });
-  }
-  
   setHovered(hovered) {
     this.isHovered = hovered;
-    this.targetDimAmount = hovered ? 1 : 0;
-    if (hovered) {
-      this.textOverlay.show();
-    } else {
-      this.textOverlay.hide();
-    }
+    this.targetHoverAmount = hovered ? 1 : 0;
   }
   
   update(scroll, direction) {
@@ -317,12 +200,9 @@ class Media {
       }
     }
 
-    // Update dimming animation
-    this.dimAmount = lerp(this.dimAmount, this.targetDimAmount, 0.1);
-    this.program.uniforms.uDimAmount.value = this.dimAmount;
-    
-    // Update text overlay
-    this.textOverlay.update();
+    // Update hover animation
+    this.hoverAmount = lerp(this.hoverAmount, this.targetHoverAmount, 0.1);
+    this.program.uniforms.uHoverAmount.value = this.hoverAmount;
 
     const planeOffset = this.plane.scale.x / 2;
     const viewportOffset = this.viewport.width / 2;
@@ -371,24 +251,31 @@ class App {
     {
       items,
       bend,
-      textColor = "#ffffff",
       borderRadius = 0,
-      font = "bold 24px Figtree",
       scrollSpeed = 2,
       scrollEase = 0.05,
+      onItemClick,
     } = {},
   ) {
     document.documentElement.classList.remove("no-js");
     this.container = container;
     this.scrollSpeed = scrollSpeed;
+    this.onItemClick = onItemClick;
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
     this.onCheckDebounce = debounce(this.onCheck, 200);
+    
+    // Add drag tracking variables
+    this.isDragging = false;
+    this.dragStartX = 0;
+    this.dragStartY = 0;
+    this.dragThreshold = 5; // pixels - minimum movement to consider it a drag
+    
     this.createRenderer();
     this.createCamera();
     this.createScene();
     this.onResize();
     this.createGeometry();
-    this.createMedias(items, bend, textColor, borderRadius, font);
+    this.createMedias(items, bend, borderRadius);
     this.update();
     this.addEventListeners();
   }
@@ -417,75 +304,29 @@ class App {
     });
   }
   
-  createMedias(items, bend = 1, textColor, borderRadius, font) {
-    const defaultItems = [
-      {
-        image: `https://picsum.photos/seed/1/800/600?grayscale`,
-        text: "Bridge",
-      },
-      {
-        image: `https://picsum.photos/seed/2/800/600?grayscale`,
-        text: "Desk Setup",
-      },
-      {
-        image: `https://picsum.photos/seed/3/800/600?grayscale`,
-        text: "Waterfall",
-      },
-      {
-        image: `https://picsum.photos/seed/4/800/600?grayscale`,
-        text: "Strawberries",
-      },
-      {
-        image: `https://picsum.photos/seed/5/800/600?grayscale`,
-        text: "Deep Diving",
-      },
-      {
-        image: `https://picsum.photos/seed/16/800/600?grayscale`,
-        text: "Train Track",
-      },
-      {
-        image: `https://picsum.photos/seed/17/800/600?grayscale`,
-        text: "Santorini",
-      },
-      {
-        image: `https://picsum.photos/seed/8/800/600?grayscale`,
-        text: "Blurry Lights",
-      },
-      {
-        image: `https://picsum.photos/seed/9/800/600?grayscale`,
-        text: "New York",
-      },
-      {
-        image: `https://picsum.photos/seed/10/800/600?grayscale`,
-        text: "Good Boy",
-      },
-      {
-        image: `https://picsum.photos/seed/21/800/600?grayscale`,
-        text: "Coastline",
-      },
-      {
-        image: `https://picsum.photos/seed/12/800/600?grayscale`,
-        text: "Palm Trees",
-      },
-    ];
-    const galleryItems = items && items.length ? items : defaultItems;
+  createMedias(items, bend = 1, borderRadius) {
+    const galleryItems = items;
     this.mediasImages = galleryItems.concat(galleryItems);
     this.medias = this.mediasImages.map((data, index) => {
       return new Media({
         geometry: this.planeGeometry,
         gl: this.gl,
         image: data.image,
+        description: data.description,
+        link: data.link,
         index,
         length: this.mediasImages.length,
         renderer: this.renderer,
         scene: this.scene,
         screen: this.screen,
-        text: data.text,
         viewport: this.viewport,
         bend,
-        textColor,
         borderRadius,
-        font,
+        onClick: () => {
+          if (this.onItemClick) {
+            this.onItemClick(data.link);
+          }
+        },
       });
     });
   }
@@ -522,24 +363,60 @@ class App {
     this.medias.forEach(media => {
       media.setHovered(media === hoveredMedia);
     });
+    
+    // Update cursor style
+    this.gl.canvas.style.cursor = hoveredMedia ? 'pointer' : 'default';
+  }
+  
+  onMouseClick(e) {
+    // Only handle clicks if we haven't been dragging
+    if (!this.isDragging) {
+      const clickedMedia = this.getMediaAtPosition(e.clientX, e.clientY);
+      if (clickedMedia && clickedMedia.onClick) {
+        clickedMedia.onClick();
+      }
+    }
   }
   
   onTouchDown(e) {
     this.isDown = true;
+    this.isDragging = false; // Reset dragging state
     this.scroll.position = this.scroll.current;
-    this.start = e.touches ? e.touches[0].clientX : e.clientX;
+    
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    this.start = clientX;
+    this.dragStartX = clientX;
+    this.dragStartY = clientY;
   }
   
   onTouchMove(e) {
     if (!this.isDown) return;
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    const distance = (this.start - x) * (this.scrollSpeed * 0.025);
+    
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    // Check if we've moved enough to consider this a drag
+    const deltaX = Math.abs(clientX - this.dragStartX);
+    const deltaY = Math.abs(clientY - this.dragStartY);
+    
+    if (!this.isDragging && (deltaX > this.dragThreshold || deltaY > this.dragThreshold)) {
+      this.isDragging = true;
+    }
+    
+    const distance = (this.start - clientX) * (this.scrollSpeed * 0.025);
     this.scroll.target = this.scroll.position + distance;
   }
   
   onTouchUp() {
     this.isDown = false;
     this.onCheck();
+    
+    // Reset dragging state after a short delay to prevent click events
+    setTimeout(() => {
+      this.isDragging = false;
+    }, 50);
   }
   
   onWheel(e) {
@@ -599,6 +476,7 @@ class App {
     this.boundOnTouchMove = this.onTouchMove.bind(this);
     this.boundOnTouchUp = this.onTouchUp.bind(this);
     this.boundOnMouseMove = this.onMouseMove.bind(this);
+    this.boundOnMouseClick = this.onMouseClick.bind(this);
     
     window.addEventListener("resize", this.boundOnResize);
     window.addEventListener("mousewheel", this.boundOnWheel);
@@ -610,11 +488,13 @@ class App {
     window.addEventListener("touchmove", this.boundOnTouchMove);
     window.addEventListener("touchend", this.boundOnTouchUp);
     
-    // Add mouse move for hover detection
+    // Add mouse move and click for hover detection and clicking
     this.gl.canvas.addEventListener("mousemove", this.boundOnMouseMove);
+    this.gl.canvas.addEventListener("click", this.boundOnMouseClick);
     this.gl.canvas.addEventListener("mouseleave", () => {
       // Clear all hovers when mouse leaves canvas
       this.medias.forEach(media => media.setHovered(false));
+      this.gl.canvas.style.cursor = 'default';
     });
   }
   
@@ -632,6 +512,7 @@ class App {
     
     if (this.gl && this.gl.canvas) {
       this.gl.canvas.removeEventListener("mousemove", this.boundOnMouseMove);
+      this.gl.canvas.removeEventListener("click", this.boundOnMouseClick);
     }
     
     if (
@@ -647,26 +528,29 @@ class App {
 export default function CircularGallery({
   items,
   bend = 3,
-  textColor = "#ffffff",
   borderRadius = 0.05,
-  font = "bold 24px Figtree",
   scrollSpeed = 2,
   scrollEase = 0.05,
 }) {
   const containerRef = useRef(null);
+  
+  const handleItemClick = (link) => {
+    window.open(link, '_blank');
+  };
+  
   useEffect(() => {
     const app = new App(containerRef.current, {
       items,
       bend,
-      textColor,
       borderRadius,
-      font,
       scrollSpeed,
       scrollEase,
+      onItemClick: handleItemClick,
     });
     return () => {
       app.destroy();
     };
-  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
+  }, [items, bend, borderRadius, scrollSpeed, scrollEase]);
+  
   return <div className="circular-gallery" ref={containerRef} />;
 }

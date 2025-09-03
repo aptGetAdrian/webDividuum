@@ -22,6 +22,8 @@ const Hero = () => {
   const heroRef = useRef(null);
   const videoRef = useRef(null);
 
+  const API_ADDRESS = import.meta.env.VITE_API_ADDRESS;
+
   const glitch = useGlitch({
     playMode: 'manual',
     timing: { duration: 550, iterations: 1 },
@@ -111,7 +113,7 @@ const Hero = () => {
         setLoading(true);
         setApiError(null);
 
-        const response = await fetch('http://localhost:5000/api/latest-video');
+        const response = await fetch(`${API_ADDRESS}/api/latest-video`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

@@ -11,6 +11,8 @@ const Episodes = () => {
   const [activeView, setActiveView] = useState('all'); // 'all' or 'categories'
   const [error, setError] = useState(null);
 
+  const API_ADDRESS = import.meta.env.VITE_API_ADDRESS;
+
   useDocumentTitle('Individuum epizode');
 
   useEffect(() => {
@@ -20,7 +22,7 @@ const Episodes = () => {
         setError(null);
         
         // Make request to your backend API
-        const response = await fetch('http://localhost:5000/api/youtube-data');
+        const response = await fetch(`${API_ADDRESS}/api/youtube-data`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

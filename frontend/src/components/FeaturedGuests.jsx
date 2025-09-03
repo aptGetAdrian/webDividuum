@@ -4,44 +4,55 @@ import CircularGallery from '/src/blocks/Components/CircularGallery/CircularGall
 
 const FeaturedGuests = () => {
   const guests = [
-    { id: 1, name: 'Dr. Viktor Markelj', image: '/assets/guests/viktorMarkelj.png', link: 'https://www.youtube.com/watch?v=NpdTZQ3u2_Q' },
-    { id: 2, name: 'Matej Skoliber', image: '/assets/guests/matejSkoliber.png', link: 'https://www.youtube.com/watch?v=ub_pnkapdxo' },
-    { id: 3, name: 'Damijan Janžekovič', image: '/assets/guests/damijanJanzekovic.png', link: 'https://www.youtube.com/watch?v=AkM8cE0vj7c' },
-    { id: 4, name: 'Grega Ivančič', image: '/assets/guests/gregaIvancic.png', link: 'https://www.youtube.com/watch?v=XJ8QTTpcj5E' },
-    { id: 5, name: 'Dr. Ivan Rihtarič', image: '/assets/guests/ivanRihtarič.png', link: 'https://www.youtube.com/watch?v=ptYK6YBr1hc' },
-    { id: 6, name: 'Dr. Martin Bele', image: '/assets/guests/martinBele.png', link: 'https://www.youtube.com/watch?v=KpYAdUFFUhY' },
-  ];
-
-  const guests2 = [
     {
       image: '/assets/guests/viktorMarkelj.png',
-      text: 'Dr. Viktor Markelj',
-      link: 'https://www.youtube.com/watch?v=NpdTZQ3u2_Q'
+      link: 'https://www.youtube.com/watch?v=NpdTZQ3u2_Q',
+      description: '/assets/guests/viktorMarkelj_opis.png'
     },
     {
       image: '/assets/guests/matejSkoliber.png',
-      text: 'Matej Skoliber',
-      link: 'https://www.youtube.com/watch?v=ub_pnkapdxo'
+      link: 'https://www.youtube.com/watch?v=ub_pnkapdxo',
+      description: '/assets/guests/matejSkoliber_opis.png'
     },
     {
       image: '/assets/guests/damijanJanzekovic.png',
-      text: 'Damijan Janžekovič',
-      link: 'https://www.youtube.com/watch?v=AkM8cE0vj7c'
+      link: 'https://www.youtube.com/watch?v=AkM8cE0vj7c',
+      description: '/assets/guests/damijanJanzekovic_opis.png'
     },
     {
       image: '/assets/guests/gregaIvancic.png',
-      text: 'Grega Ivančič',
-      link: 'https://www.youtube.com/watch?v=XJ8QTTpcj5E'
+      link: 'https://www.youtube.com/watch?v=XJ8QTTpcj5E',
+      description: '/assets/guests/gregaIvancic_opis.png'
     },
     {
-      image: '/assets/guests/ivanRihtarič.png',
-      text: 'Dr. Ivan Rihtarič',
-      link: 'https://www.youtube.com/watch?v=ptYK6YBr1hc'
+      image: '/assets/guests/ivanRihtaric.png',
+      link: 'https://www.youtube.com/watch?v=ptYK6YBr1hc',
+      description: '/assets/guests/ivanRihtaric_opis.png'
+    },
+    {
+      image: '/assets/guests/alesMaver.png',
+      link: 'https://www.youtube.com/watch?v=4W448Sls-yg',
+      description: '/assets/guests/alesMaver_opis.png'
+    },
+    {
+      image: '/assets/guests/andrejStremfelj.png',
+      link: 'https://www.youtube.com/watch?v=Mm1Nveb-c44',
+      description: '/assets/guests/andrejStremfelj_opis.png'
+    },
+    {
+      image: '/assets/guests/goranSrok.png',
+      link: 'https://www.youtube.com/watch?v=jZTkqyXzgpI',
+      description: '/assets/guests/goranSrok_opis.png'
+    },
+    {
+      image: '/assets/guests/igorPlohl.png',
+      link: 'https://www.youtube.com/watch?v=g8pRKA66VS0',
+      description: '/assets/guests/igorPlohl_opis.png'
     },
     {
       image: '/assets/guests/martinBele.png',
-      text: 'Dr. Martin Bele',
-      link: 'https://www.youtube.com/watch?v=KpYAdUFFUhY'
+      link: 'https://www.youtube.com/watch?v=g8pRKA66VS0',
+      description: '/assets/guests/martinBele_opis.png'
     },
   ];
 
@@ -65,7 +76,7 @@ const FeaturedGuests = () => {
         textColor="#12353e" 
         borderRadius={0.05} 
         scrollEase={0.02} 
-        items={guests2}
+        items={guests}
         font="bold 24px 'Comic Sans MS', cursive, sans-serif"
         />
       </div>

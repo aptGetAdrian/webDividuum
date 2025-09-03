@@ -387,21 +387,19 @@ def not_found(error):
 def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
-def my_api(request):
-    """Entrypoint for Google Cloud Functions"""
-    return app(request.environ, lambda status, headers: (status, headers, []))
-# if __name__ == '__main__':
-#     # Check if required environment variables are set
-#     if not YOUTUBE_API_KEY:
-#         logger.error("YOUTUBE_API_KEY is required")
-#         exit(1)
-#     
-#     logger.info("Starting YouTube API server...")
-#     logger.info(f"Using Channel ID: {CHANNEL_ID}")
-#     
-#     # Run the app
-#     app.run(
-#         host=os.getenv('HOST', '127.0.0.1'),
-#         port=int(os.getenv('PORT', 5000)),
-#         debug=os.getenv('DEBUG', 'False').lower() == 'true'
-#     )
+
+if __name__ == '__main__':
+    # Check if required environment variables are set
+    if not YOUTUBE_API_KEY:
+        logger.error("YOUTUBE_API_KEY is required")
+        exit(1)
+    
+    logger.info("Starting YouTube API server...")
+    logger.info(f"Using Channel ID: {CHANNEL_ID}")
+    
+    # Run the app
+    app.run(
+        host=os.getenv('HOST', '0.0.0.0'),
+        port=int(os.getenv('PORT', 8080)),
+        debug=os.getenv('DEBUG', 'False').lower() == 'true'
+    )
