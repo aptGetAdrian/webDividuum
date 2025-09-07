@@ -50,7 +50,7 @@ const Hosts = () => {
               handle="lan_kokol"
               status=""
               contactText=""
-              avatarUrl="/assets/lan_card.png"
+              avatarUrl="/assets/lan1.png"
               enableTilt={true}
               iconUrl="/assets/titleImage.png"
             />
@@ -78,7 +78,7 @@ const Hosts = () => {
               handle="patrikmajhen"
               status=""
               contactText=""
-              avatarUrl="/assets/pato.png"
+              avatarUrl="/assets/patrik2.png"
               enableTilt={true}
               iconUrl="/assets/titleImage.png"
             />
@@ -101,12 +101,12 @@ const Hosts = () => {
         >
           <a href="https://www.instagram.com/lan_kokol/" target="_blank" rel="noopener noreferrer">
             <ProfileCard
-              name="Lan Kokol"
-              title="Voditelj"
-              handle="lan_kokol"
+              name="Aljaž Balažic"
+              title="Urednik"
+              handle="aljaz_balazic"
               status=""
               contactText=""
-              avatarUrl="/assets/lan_card.png"
+              avatarUrl="/assets/aljaz1.png"
               enableTilt={true}
               iconUrl="/assets/titleImage.png"
             />
@@ -117,35 +117,6 @@ const Hosts = () => {
             <br></br>
             <p>
               Član ekipe, ki skrbi, da pogovori ne ostanejo le v zvoku – ampak zaživijo tudi na zaslonih. Glavni kreator in urednik videjev.
-            </p>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="host-section reverse"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          <a href="https://www.instagram.com/patrikmajhen/" target="_blank" rel="noopener noreferrer">
-            <ProfileCard
-              name="Patrik Majhen"
-              title="Voditelj"
-              handle="patrikmajhen"
-              status=""
-              contactText=""
-              avatarUrl="/assets/pato.png"
-              enableTilt={true}
-              iconUrl="/assets/titleImage.png"
-            />
-          </a>
-          <div className="host-content">
-            <h2>Adrian Cvetko</h2>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-              ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-              aliquip ex ea commodo consequat.
             </p>
           </div>
         </motion.div>

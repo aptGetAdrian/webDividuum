@@ -59,6 +59,7 @@ const FeaturedGuests = () => {
   return (
     <section className="featured-guests section">
 
+
       <motion.h2
           className="section-title"
           initial={{ opacity: 0, y: 20 }}

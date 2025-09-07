@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'); 
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
 :root {
   --primary-color: #1a4b5c;
@@ -16,6 +17,10 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
+  /*
+  font-family: 'Anton', sans-serif;
+  letter-spacing: 0.3rem;
+  */
 }
 
 body {

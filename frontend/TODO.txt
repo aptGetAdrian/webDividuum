@@ -5,12 +5,16 @@ barvno shemo prilagodi
 
 cleanej up CSS datoteke. mislim, da so tudi ene unused jsx datoteke
 
-ove kartice porihtej, ko boš doba slike. naredi tebe pa ovega drugega samo kak kartici. 
-ne zdi se mi vredno opisa
-
 wallpaper z ovimi fingerprinti, probej uprabiti to, kej ti patrik pošle
 
-ša tisti fingerprint v navbari, ko je v mobile, naredi, ka de od zacetka sla crtica
+- približej obraze pri ovih karticah
+- kofi sekcija
+- kvaddratek na epizodah (opcija: brez teksta)
+- 3 sekunde ove goste text, ka se prikaze na mobile
+- black and white uvodni video
+- individuum podcsat razdelek hardcodej vun pri kategoriziranih epizodah
+- uporabi anton font za headerje
+- naredi, ka je bol varno za ovi kontakt
 
 BACKEND:
 
