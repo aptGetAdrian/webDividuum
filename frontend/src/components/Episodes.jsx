@@ -20,16 +20,16 @@ const Episodes = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Make request to your backend API
         const response = await fetch(`${API_ADDRESS}/api/youtube-data`);
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         setEpisodes(data.episodes || []);
         setPlaylists(data.playlists || []);
       } catch (error) {
@@ -39,14 +39,14 @@ const Episodes = () => {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, []);
 
   const formatPlaylistTitle = (title) => {
     return title.split(' - ')[0].trim();
   };
-  
+
   const renderEpisodeCard = (episode, index) => (
     <motion.a
       key={episode.id}
@@ -73,7 +73,7 @@ const Episodes = () => {
         height: 'auto',
         maxWidth: '350px',
         background: 'rgba(20, 20, 20, 0.95)',
-        borderRadius: '16px',
+        borderRadius: '4px',
         overflow: 'hidden',
         boxShadow: '0 4px 23px 0 rgba(0,0,0,0.45)',
         textDecoration: 'none',
@@ -98,10 +98,10 @@ const Episodes = () => {
           {episode.snippet.title}
         </h2>
         <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary, #aaa)' }}>
-          {new Date(episode.snippet.publishedAt).toLocaleDateString('sl-SI', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          {new Date(episode.snippet.publishedAt).toLocaleDateString('sl-SI', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
           })}
         </p>
       </div>
@@ -132,8 +132,8 @@ const Episodes = () => {
             onClick={() => setActiveView('all')}
             style={{
               padding: '0.8rem 1.5rem',
-              background: activeView === 'all' 
-                ? 'linear-gradient(135deg, var(--accent-color), rgba(255, 255, 255, 0.1))' 
+              background: activeView === 'all'
+                ? 'linear-gradient(135deg, var(--accent-color), rgba(255, 255, 255, 0.1))'
                 : 'rgba(20, 20, 20, 0.7)',
               color: 'var(--text-color)',
               border: activeView === 'all' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
@@ -144,8 +144,8 @@ const Episodes = () => {
               letterSpacing: '1px',
               cursor: 'pointer',
               backdropFilter: 'blur(10px)',
-              boxShadow: activeView === 'all' 
-                ? '0 4px 15px rgba(0,0,0,0.3)' 
+              boxShadow: activeView === 'all'
+                ? '0 4px 15px rgba(0,0,0,0.3)'
                 : '0 2px 10px rgba(0,0,0,0.2)',
               transition: 'all 0.3s ease'
             }}
@@ -168,8 +168,8 @@ const Episodes = () => {
             onClick={() => setActiveView('categories')}
             style={{
               padding: '0.8rem 1.5rem',
-              background: activeView === 'categories' 
-                ? 'linear-gradient(135deg, var(--accent-color), rgba(255, 255, 255, 0.1))' 
+              background: activeView === 'categories'
+                ? 'linear-gradient(135deg, var(--accent-color), rgba(255, 255, 255, 0.1))'
                 : 'rgba(20, 20, 20, 0.7)',
               color: 'var(--text-color)',
               border: activeView === 'categories' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
@@ -180,8 +180,8 @@ const Episodes = () => {
               letterSpacing: '1px',
               cursor: 'pointer',
               backdropFilter: 'blur(10px)',
-              boxShadow: activeView === 'categories' 
-                ? '0 4px 15px rgba(0,0,0,0.3)' 
+              boxShadow: activeView === 'categories'
+                ? '0 4px 15px rgba(0,0,0,0.3)'
                 : '0 2px 10px rgba(0,0,0,0.2)',
               transition: 'all 0.3s ease'
             }}
@@ -313,53 +313,56 @@ const Episodes = () => {
             {/* Categories View */}
             {activeView === 'categories' && (
               <div style={{ width: '100%', paddingBottom: "2.5vh" }}>
-                {playlists.map((playlist, playlistIndex) => (
-                  <motion.div
-                    key={playlist.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: playlistIndex * 0.2 }}
-                    style={{ marginBottom: '4rem' }}
-                  >
-                    {/* Category Title */}
-                    <motion.h3
-                      initial={{ opacity: 0, y: 20 }}
+                {playlists
+                  .filter(playlist => playlist.snippet.title !== "Individuum podcast")
+                  .map((playlist, playlistIndex) => (
+                    <motion.div
+                      key={playlist.id}
+                      initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.8, delay: playlistIndex * 0.2 + 0.1 }}
-                      style={{
-                        fontSize: '1.8rem',
-                        fontWeight: '600',
-                        color: 'var(--text-color)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        textAlign: 'center',
-                        margin: '0 0 2rem 0',
-                        background: 'linear-gradient(to right, var(--text-color), var(--accent-color))',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-                      }}
+                      transition={{ duration: 0.6, delay: playlistIndex * 0.2 }}
+                      style={{ marginBottom: '4rem' }}
                     >
-                      {formatPlaylistTitle(playlist.snippet.title)}
-                    </motion.h3>
+                      {/* Category Title */}
+                      <motion.h3
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: playlistIndex * 0.2 + 0.1 }}
+                        style={{
+                          fontSize: '1.8rem',
+                          fontWeight: '600',
+                          color: 'var(--text-color)',
+                          textTransform: 'uppercase',
+                          textAlign: 'center',
+                          margin: '0 0 2rem 0',
+                          background: 'linear-gradient(to right, var(--text-color), var(--accent-color))',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                          fontFamily: "Anton, sans-serif",
+                          letterSpacing: "0.37rem",
+                        }}
+                      >
+                        {formatPlaylistTitle(playlist.snippet.title)}
+                      </motion.h3>
 
-                    {/* Episodes Grid */}
-                    <div style={{
-                      width: '100%',
-                      maxWidth: '100%',
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '3.3rem',
-                      justifyContent: 'center',
-                      margin: '0 auto'
-                    }}>
-                      {playlist.videos.map((episode, index) => 
-                        renderEpisodeCard(episode, playlistIndex * 10 + index)
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-                
+                      {/* Episodes Grid */}
+                      <div style={{
+                        width: '100%',
+                        maxWidth: '100%',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '3.3rem',
+                        justifyContent: 'center',
+                        margin: '0 auto'
+                      }}>
+                        {playlist.videos.map((episode, index) =>
+                          renderEpisodeCard(episode, playlistIndex * 10 + index)
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+
                 {playlists.length === 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}

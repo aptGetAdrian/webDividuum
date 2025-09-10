@@ -1,21 +1,12 @@
-overlay za tote kartice v galeriji gostov. v bistvi nej bo overlay svoja slika in samo 
-switchnes med jima
-
-barvno shemo prilagodi
-
 cleanej up CSS datoteke. mislim, da so tudi ene unused jsx datoteke
 
-wallpaper z ovimi fingerprinti, probej uprabiti to, kej ti patrik pošle
-
 - približej obraze pri ovih karticah
-- kofi sekcija
-- kvaddratek na epizodah (opcija: brez teksta)
 - 3 sekunde ove goste text, ka se prikaze na mobile
-- black and white uvodni video
-- individuum podcsat razdelek hardcodej vun pri kategoriziranih epizodah
-- uporabi anton font za headerje
-- naredi, ka je bol varno za ovi kontakt
+- popravi za ovi loading pri spodjih linkih
 
-BACKEND:
+- rewrite backend, da mas eno datoteko z vsemi informacijami, ki se prepise nekda ponoci enkrat na dan
+  in te na podlagi tega loadej videe, ker drugaci prevec dugo treba
 
-za deployment pogledni app engine od googla. ali pa lowkey samo google cloud functions. ker like, to bota dve funkciji brah
+- probej nekej za background, wallpaper z ovimi fingerprinti, probej uprabiti to, kej ti patrik pošle
+
+- deploy

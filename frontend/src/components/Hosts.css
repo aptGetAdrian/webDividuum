@@ -25,6 +25,8 @@
   font-weight: 700;
   position: relative;
   padding-bottom: 1rem;
+  font-family: 'Anton', sans-serif;
+  letter-spacing: 0.35rem;
 }
 
 .podcast-title::after {

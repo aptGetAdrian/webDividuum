@@ -334,7 +334,7 @@ const Hero = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
             >
-              Raziskujemo zgodbe, delimo znanje in povezujemo ljudi
+              Daj vsaki zgodbi priložnost...
             </motion.p>
             <motion.a
               href="https://linktr.ee/individuumpodcast"

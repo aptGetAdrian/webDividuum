@@ -6,7 +6,7 @@
   top: 0;
   z-index: 1000;
   padding: 1.5rem 0; /* Increased padding */
-  transition: all 0.3s ease; /* Smooth transition */
+  transition: all 0.8s ease; /* Smooth transition */
   box-shadow: none; /* No shadow initially */
   height: 5rem; /* Add explicit height */
 }
@@ -36,6 +36,7 @@
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  
 }
 
 .nav-links a {
@@ -49,6 +50,8 @@
   position: relative;
   padding: 0.5rem 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Added subtle text shadow */
+  font-family: 'Anton', sans-serif;
+  letter-spacing: 0.35rem;
 }
 
 .nav-links a::after {

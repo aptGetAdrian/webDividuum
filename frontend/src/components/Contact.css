@@ -138,6 +138,44 @@
   color: var(--text-color);
 }
 
+/* Add to your existing Contact.css file */
+
+.submit-button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.rate-limit-warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 10px;
+  color: #856404;
+  font-size: 14px;
+  text-align: center;
+}
+
+.status-message.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.status-message {
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 15px;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .contact-section {
     padding: 100px 0 60px;

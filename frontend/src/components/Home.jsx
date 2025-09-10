@@ -1,7 +1,7 @@
 import Hero from './Hero';
-import Hosts from './Hosts';
-import FeaturedGuests from './FeaturedGuests';
+import Support from './Support';
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import FeaturedGuests from './FeaturedGuests';
 
 const Home = () => {
   useDocumentTitle('Individuum Podcast');
@@ -9,8 +9,8 @@ const Home = () => {
   return (
     <main>
       <Hero />
-      {/* <Hosts /> */}
       <FeaturedGuests />
+      <Support />
     </main>
   );
 };

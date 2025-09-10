@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import emailjs from 'emailjs-com';
 import useDocumentTitle from '../hooks/useDocumentTitle';
@@ -18,6 +18,63 @@ const Contact = () => {
     message: ''
   });
 
+  const [rateLimitInfo, setRateLimitInfo] = useState({
+    remaining: 2,
+    resetTime: null,
+    isBlocked: false
+  });
+
+  // Rate limiting configuration
+  const RATE_LIMIT = 2; // messages per minute
+  const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
+  const STORAGE_KEY = 'contact_form_submissions';
+
+  // Check rate limit on component mount and set up cleanup
+  useEffect(() => {
+    checkRateLimit();
+    const interval = setInterval(checkRateLimit, 1000); // Check every second
+    return () => clearInterval(interval);
+  }, []);
+
+  const checkRateLimit = () => {
+    const now = Date.now();
+    const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    
+    // Filter out submissions older than rate limit window
+    const recentSubmissions = submissions.filter(
+      timestamp => now - timestamp < RATE_LIMIT_WINDOW
+    );
+    
+    // Update localStorage with filtered submissions
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(recentSubmissions));
+    
+    const remaining = Math.max(0, RATE_LIMIT - recentSubmissions.length);
+    const isBlocked = remaining === 0;
+    
+    let resetTime = null;
+    if (isBlocked && recentSubmissions.length > 0) {
+      resetTime = recentSubmissions[0] + RATE_LIMIT_WINDOW;
+    }
+    
+    setRateLimitInfo({
+      remaining,
+      resetTime,
+      isBlocked
+    });
+  };
+
+  const addSubmissionTimestamp = () => {
+    const now = Date.now();
+    const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    submissions.push(now);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
+  };
+
+  const getTimeUntilReset = () => {
+    if (!rateLimitInfo.resetTime) return 0;
+    return Math.max(0, Math.ceil((rateLimitInfo.resetTime - Date.now()) / 1000));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -28,6 +85,17 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check rate limit before submitting
+    if (rateLimitInfo.isBlocked) {
+      const timeLeft = getTimeUntilReset();
+      setStatus({
+        type: 'error',
+        message: `Preveč zahtev. Poskusite ponovno čez ${timeLeft} sekund.`
+      });
+      return;
+    }
+
     setStatus({ type: 'loading', message: 'Pošiljanje...' });
 
     try {
@@ -42,7 +110,9 @@ const Contact = () => {
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY
       );
 
-      
+      // Add timestamp after successful submission
+      addSubmissionTimestamp();
+      checkRateLimit(); // Update rate limit info immediately
 
       setStatus({
         type: 'success',
@@ -71,7 +141,7 @@ const Contact = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1>Podpora projekta</h1>
+          <h1>PODPORA PROJEKTA</h1>
           <p className="contact-description">
             Imate vprašanje, predlog ali želite deliti svojo zgodbo? Pišite nam!
           </p>
@@ -118,11 +188,21 @@ const Contact = () => {
 
             <button 
               type="submit" 
-              className={`submit-button ${status.type === 'loading' ? 'loading' : ''}`}
-              disabled={status.type === 'loading'}
+              className={`submit-button ${status.type === 'loading' ? 'loading' : ''} ${rateLimitInfo.isBlocked ? 'disabled' : ''}`}
+              disabled={status.type === 'loading' || rateLimitInfo.isBlocked}
             >
-              Pošlji sporočilo
+              {rateLimitInfo.isBlocked 
+                ? `Počakajte ${getTimeUntilReset()}s` 
+                : 'Pošlji sporočilo'
+              }
             </button>
+
+            {/* Rate limit info */}
+            {rateLimitInfo.remaining < 2 && !rateLimitInfo.isBlocked && (
+              <div className="rate-limit-warning">
+                Še {rateLimitInfo.remaining} sporočil{rateLimitInfo.remaining === 1 ? 'o' : 'i'} to minuto
+              </div>
+            )}
 
             {status.message && (
               <motion.div 

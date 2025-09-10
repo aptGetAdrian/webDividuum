@@ -19,7 +19,7 @@ const Hosts = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="podcast-title">O podkastu</h2>
+          <h2 className="podcast-title">O PODKASTU</h2>
           <p className="podcast-text">
             <b>Individuum Podcast</b> je prostor, kjer se resnici ne prisega, temveč se ji pogumno približuje skozi zgodbe drugih. Vodita ga Lan in Patrik, dva radovedna študenta, ki se ne bojita sesti za mizo z ljudmi, ki mislijo drugače, živijo drugače ali so preprosto doživeli nekaj, česar sama še nista.
           </p>
@@ -50,9 +50,10 @@ const Hosts = () => {
               handle="lan_kokol"
               status=""
               contactText=""
-              avatarUrl="/assets/lan1.png"
+              avatarUrl="/assets/lan2.png"
               enableTilt={true}
               iconUrl="/assets/titleImage.png"
+              miniAvatarUrl="/assets/lanTtitle.jpg"
             />
           </a>
           <div className="host-content">
@@ -81,6 +82,7 @@ const Hosts = () => {
               avatarUrl="/assets/patrik2.png"
               enableTilt={true}
               iconUrl="/assets/titleImage.png"
+              miniAvatarUrl="/assets/patrikTitle.jpg"
             />
           </a>
           <div className="host-content">
@@ -99,16 +101,17 @@ const Hosts = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <a href="https://www.instagram.com/lan_kokol/" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.instagram.com/aljazbalazic/" target="_blank" rel="noopener noreferrer">
             <ProfileCard
               name="Aljaž Balažic"
               title="Urednik"
-              handle="aljaz_balazic"
+              handle="aljazbalazic"
               status=""
               contactText=""
               avatarUrl="/assets/aljaz1.png"
               enableTilt={true}
               iconUrl="/assets/titleImage.png"
+              miniAvatarUrl="/assets/aljazTitle.jpg"
             />
           </a>
           <div className="host-content">
