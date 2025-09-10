@@ -69,33 +69,25 @@ const Footer = () => {
                     style={{ '--platform-color': platform.color }}
                     initial={{
                       opacity: 0,
-                      y: 30,
-                      scale: 0.9
+                      y: 20,
                     }}
                     whileInView={{
                       opacity: 1,
                       y: 0,
-                      scale: 1
                     }}
                     transition={{
-                      duration: 0.8,
+                      duration: 0.4,
+                    ease: "easeOut"
                     }}
                     viewport={{
                       once: true,
                     }}
                     whileHover={{
-                      scale: 1.05,
-                      transition: { duration: 0.05 }
+                      scale: 1.03,
+                    transition: { duration: 0.1 }
                     }}
                     whileTap={{
                       scale: 0.98,
-                      transition: { duration: 0.1 }
-                    }}
-                    animate={{
-                      scale: 1,
-                      transition: {
-                        duration: 0.05,
-                      }
                     }}
                   >
                     <span className="platform-icon">{platform.icon}</span>
@@ -115,33 +107,29 @@ const Footer = () => {
                     className="platform-link-social"
                     initial={{
                       opacity: 0,
-                      y: 30,
-                      scale: 0.9
+                      y: 20,
                     }}
                     whileInView={{
                       opacity: 1,
                       y: 0,
-                      scale: 1
                     }}
                     transition={{
-                      duration: 0.8,
-                      delay: 0.1 * (index + 1)
+                      duration: 0.4,
+                      delay: 0.05 * (index + 1),
+                      ease: "easeOut"
                     }}
                     viewport={{
                       once: true,
                     }}
                     whileHover={{
-                      scale: 1.05,
-                      transition: { duration: 0.05 }
+                      scale: 1.03,
+                      transition: { duration: 0.1 }
                     }}
                     whileTap={{
                       scale: 0.98,
-                      transition: { duration: 0.1 }
                     }}
-
                     style={{
                       '--platform-color': platform.color,
-                      '--icon-size': '3rem'
                     }}
                   >
                     {React.cloneElement(platform.icon, {
@@ -157,25 +145,21 @@ const Footer = () => {
           {/* Site navigation section */}
           <motion.div
             className="footer-section"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
             viewport={{ once: true }}
           >
             <h3 className="footer-heading">Navigacija</h3>
             <nav className="footer-nav">
               {sitePages.map((page) => (
-                <motion.a
+                <a
                   key={page.name}
                   href={page.path}
                   className="footer-nav-link"
-                  whileHover={{
-                    x: 5,
-                    transition: { duration: 0.2 }
-                  }}
                 >
                   {page.name}
-                </motion.a>
+                </a>
               ))}
             </nav>
           </motion.div>
@@ -183,9 +167,10 @@ const Footer = () => {
 
         <motion.div
           className="footer-bottom"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          viewport={{ once: true }}
         >
           <p>&copy; 2025 Individuum. Vse pravice pridržane.</p>
         </motion.div>

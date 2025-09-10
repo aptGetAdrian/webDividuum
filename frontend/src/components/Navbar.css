@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .navbar {
   background-color: rgba(10, 31, 38, 0.2); /* 80% transparent initially */
   backdrop-filter: blur(10px);
@@ -8,7 +12,22 @@
   padding: 1.5rem 0; /* Increased padding */
   transition: all 0.8s ease; /* Smooth transition */
   box-shadow: none; /* No shadow initially */
-  height: 5rem; /* Add explicit height */
+  height: 5.5rem; /* Add explicit height */
+  transform: translateY(0);
+  transition: transform 0.3s ease, background-color 0.8s ease, padding 0.8s ease;
+}
+
+.navbar.hidden {
+  transform: translateY(-100%);
+}
+
+.coffee-icon2 {
+  width: 2rem;
+  height: 2rem;
+  stroke: #ffffff;
+  line-height: 0;
+  padding: 0;
+  margin: 0;
 }
 
 .navbar.scrolled {
@@ -36,7 +55,6 @@
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  
 }
 
 .nav-links a {
@@ -57,10 +75,10 @@
 .nav-links a::after {
   content: "";
   position: absolute;
-  bottom: -6px; /* Slightly lowered the underline */
+  bottom: -0.2rem; /* Slightly lowered the underline */
   left: 0;
   width: 0;
-  height: 2.5px; /* Made underline slightly thicker */
+  height: 1px; /* Made underline slightly thicker */
   background-color: var(--accent-color);
   transition: width 0.3s ease;
   border-radius: 2px; /* Rounded the underline edges */
@@ -94,6 +112,10 @@
   background-color: var(--text-color);
   transition: all 0.3s ease;
   border-radius: 2px; /* Rounded the edges of hamburger lines */
+}
+
+a.link-coffee {
+  padding: 0;
 }
 
 @media (max-width: 768px) {

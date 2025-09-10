@@ -19,7 +19,7 @@ const Hosts = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="podcast-title">O PODKASTU</h2>
+          <h2 className="podcast-title">O PODCASTU</h2>
           <p className="podcast-text">
             <b>Individuum Podcast</b> je prostor, kjer se resnici ne prisega, temveč se ji pogumno približuje skozi zgodbe drugih. Vodita ga Lan in Patrik, dva radovedna študenta, ki se ne bojita sesti za mizo z ljudmi, ki mislijo drugače, živijo drugače ali so preprosto doživeli nekaj, česar sama še nista.
           </p>
@@ -120,6 +120,35 @@ const Hosts = () => {
             <br></br>
             <p>
               Član ekipe, ki skrbi, da pogovori ne ostanejo le v zvoku – ampak zaživijo tudi na zaslonih. Glavni kreator in urednik videjev.
+            </p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="host-section reverse"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <a href="https://www.instagram.com/adri____an/" target="_blank" rel="noopener noreferrer">
+            <ProfileCard
+              name="Adrian Cvetko"
+              title="Programer"
+              handle="adri____an"
+              status=""
+              contactText=""
+              avatarUrl="/assets/adrian1.png"
+              enableTilt={true}
+              iconUrl="/assets/titleImage.png"
+              miniAvatarUrl="/assets/adrianTtitle.jpg"
+            />
+          </a>
+          <div className="host-content">
+            <h2>Adrian Cvetko</h2>
+            <h3>Tehnična podpora</h3>
+            <br></br>
+            <p>
+              Mojster v ozadju – skrbi za programerski del, tehniko in digitalne rešitve. Da vse teče gladko, je njegova zasluga.
             </p>
           </div>
         </motion.div>

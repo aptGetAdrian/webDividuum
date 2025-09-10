@@ -1,8 +1,12 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import './Hero.css';
 import { useGlitch } from 'react-powerglitch'
 import Particles from '/src/blocks/Backgrounds/Particles/Particles.jsx';
+
+// Lazy-loaded video components
+const LazyDesktopVideo = lazy(() => import('./LazyDesktopVideo'));
+const LazyMobileVideo = lazy(() => import('./LazyMobileVideo'));
 
 const Hero = () => {
   const [latestVideoId, setLatestVideoId] = useState('YOUR_VIDEO_ID'); // fallback
@@ -14,12 +18,14 @@ const Hero = () => {
   const [showSecondImage, setShowSecondImage] = useState(false);
   const [lastScrollTime, setLastScrollTime] = useState(0);
   const [apiError, setApiError] = useState(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isGlitchPlaying, setIsGlitchPlaying] = useState(false); // Track if glitch is playing
   const heroRef = useRef(null);
 
   const API_ADDRESS = import.meta.env.VITE_API_ADDRESS;
 
   const glitch = useGlitch({
-    playMode: 'manual', // Changed from 'hover' to 'manual' for mobile control
+    playMode: 'manual',
     timing: { duration: 550, iterations: 1 },
     glitchTimeSpan: { start: 0, end: 1 },
     shake: { velocity: 12, amplitudeX: 0.2, amplitudeY: 0.19 },
@@ -39,30 +45,12 @@ const Hero = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Custom hook to detect scroll
-  const useScrollDetection = () => {
-    useEffect(() => {
-      if (!isMobile) return;
-
-      const handleScroll = () => {
-        const currentTime = Date.now();
-        const timeSinceLastScroll = currentTime - lastScrollTime;
-
-        // Only trigger if enough time has passed since last scroll trigger (throttling)
-        if (timeSinceLastScroll > 50) { // 50ms throttle
-          setLastScrollTime(currentTime);
-          triggerGlitchAnimation();
-        }
-      };
-
-      window.addEventListener('scroll', handleScroll, { passive: true });
-
-      return () => window.removeEventListener('scroll', handleScroll);
-    }, [isMobile, lastScrollTime]);
-  };
-
   // Function to trigger the glitch animation
   const triggerGlitchAnimation = () => {
+    if (isGlitchPlaying) return; // Prevent if already playing
+    
+    setIsGlitchPlaying(true);
+    
     // Start the glitch effect
     glitch.startGlitch();
 
@@ -79,11 +67,40 @@ const Hero = () => {
       }
     }, 70); // Switch every 70ms for fast back-and-forth effect
 
+    // Set timeout to end the animation
     setTimeout(() => {
       glitch.stopGlitch();
       clearInterval(switchInterval);
       setShowSecondImage(false); // Ensure we end on the first image
-    }, 200); // Match the duration from glitch config
+      
+      // Allow glitch to be triggered again after a brief cooldown
+      setTimeout(() => {
+        setIsGlitchPlaying(false);
+      }, 200); // Cooldown period
+    }, 550); // Match the duration from glitch config
+  };
+
+  // Custom hook to detect scroll
+  const useScrollDetection = () => {
+    useEffect(() => {
+      if (!isMobile) return;
+
+      const handleScroll = () => {
+        const currentTime = Date.now();
+        const timeSinceLastScroll = currentTime - lastScrollTime;
+
+        // Only trigger if enough time has passed since last scroll trigger (throttling)
+        // Increased throttle time to prevent rapid triggers
+        if (timeSinceLastScroll > 300 && !isGlitchPlaying) {
+          setLastScrollTime(currentTime);
+          triggerGlitchAnimation();
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+
+      return () => window.removeEventListener('scroll', handleScroll);
+    }, [isMobile, lastScrollTime, isGlitchPlaying]); // Added isGlitchPlaying dependency
   };
 
   // Use the scroll detection hook
@@ -136,7 +153,8 @@ const Hero = () => {
 
   // Desktop hover handlers
   const handleMouseEnter = () => {
-    if (!isMobile) {
+    if (!isMobile && !isGlitchPlaying) {
+      setIsGlitchPlaying(true);
       glitch.startGlitch();
 
       // Create back-and-forth effect for desktop hover too
@@ -154,6 +172,7 @@ const Hero = () => {
       setTimeout(() => {
         clearInterval(switchInterval);
         setShowSecondImage(true); // Show second image on hover
+        setIsGlitchPlaying(false);
       }, 550);
     }
   };
@@ -162,6 +181,7 @@ const Hero = () => {
     if (!isMobile) {
       glitch.stopGlitch();
       setShowSecondImage(false); // Return to first image when not hovering
+      setIsGlitchPlaying(false);
     }
   };
 
@@ -200,43 +220,29 @@ const Hero = () => {
         {/* Background Video or Fallback Image */}
         <div className="hero-background-video">
           {!videoError ? (
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              webkit-playsinline="true"
-              preload="auto"
-              className="background-video"
-              onError={handleVideoError}
-              key={isMobile ? 'mobile' : 'desktop'} // Force re-render when switching
-            >
+            <Suspense fallback={
+              <div className="video-loading-placeholder">
+                <img
+                  src="/assets/videoplayback.00_15_09_07.Still001.png"
+                  alt="Background"
+                  className="background-video"
+                />
+              </div>
+            }>
               {isMobile ? (
-                // Mobile video sources
-                <>
-                  <source
-                    src="/assets/mobile-video.mp4"
-                    type="video/mp4"
-                  />
-                  <source
-                    src="/assets/videoplayback_1_mobile.webm"
-                    type="video/webm"
-                  />
-                </>
+                <LazyMobileVideo 
+                  onError={handleVideoError}
+                  onLoad={() => setVideoLoaded(true)}
+                  className={`background-video ${videoLoaded ? 'video-loaded' : 'video-loading'}`}
+                />
               ) : (
-                // Desktop video sources
-                <>
-                  <source
-                    src="/assets/desktop-video.mp4"
-                    type="video/mp4"
-                  />
-                  <source
-                    src="/assets/videoplayback_1.webm"
-                    type="video/webm"
-                  />
-                </>
+                <LazyDesktopVideo 
+                  onError={handleVideoError}
+                  onLoad={() => setVideoLoaded(true)}
+                  className={`background-video ${videoLoaded ? 'video-loaded' : 'video-loading'}`}
+                />
               )}
-            </video>
+            </Suspense>
           ) : (
             <img
               src="/assets/videoplayback.00_15_09_07.Still001.png"
@@ -290,17 +296,6 @@ const Hero = () => {
       </section>
 
       <section className="hero-second">
-        <div className="hero-background-video-second">
-          <img
-            src="/assets/backgroundimaheM.png"
-            alt="Background"
-            className="background-image-second"
-          />
-        </div>
-
-        <div className="film-grain-second"></div>
-        <div className="hero-overlay-second"></div>
-
         <div className="container hero-content-second">
           <motion.div
             className="hero-text-second"
@@ -326,7 +321,7 @@ const Hero = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              INDIVIDUUM PODKAST
+              INDIVIDUUM PODCAST
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}

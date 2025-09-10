@@ -167,3 +167,9 @@ h3 {
     font-size: 2rem;
   }
 }
+
+@media (max-width: 480px) {
+  .podcast-title {
+    font-size: 2rem;
+  }
+}

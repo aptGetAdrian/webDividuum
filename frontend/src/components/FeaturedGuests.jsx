@@ -1,8 +1,23 @@
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import './FeaturedGuests.css';
 import CircularGallery from '/src/blocks/Components/CircularGallery/CircularGallery.jsx'
 
 const FeaturedGuests = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIfMobile();
+
+    window.addEventListener('resize', checkIfMobile);
+
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
   const guests = [
     {
       image: '/assets/guests/viktorMarkelj.png',
@@ -56,64 +71,32 @@ const FeaturedGuests = () => {
     },
   ];
 
+
   return (
     <section className="featured-guests section">
-
-
       <motion.h2
-          className="section-title"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          Pogovori z gosti kot so:
-        </motion.h2>
+        className="section-title"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        PRETEKLI GOSTJE:
+      </motion.h2>
 
       <div style={{ height: '600px', position: 'relative' }}>
-        <CircularGallery 
-        scrollSpeed={1.5} 
-        bend={0.4} 
-        textColor="#12353e" 
-        borderRadius={0.05} 
-        scrollEase={0.02} 
-        items={guests}
-        font="bold 24px 'Comic Sans MS', cursive, sans-serif"
+        <CircularGallery
+          scrollSpeed={isMobile ? 2.5 : 1.5}
+          bend={0.4}
+          textColor="#12353e"
+          borderRadius={0.05}
+          scrollEase={isMobile ? 0.05 : 0.03}
+          items={guests}
+          font="bold 24px 'Comic Sans MS', cursive, sans-serif"
         />
       </div>
-
-      {/* 
-
-      <div className="container">
-        
-        
-        <div className="guests-grid">
-          {guests.map((guest) => (
-            <a key={guest.id} href={guest.link} target="_blank" rel="noopener noreferrer">
-            <motion.div
-              key={guest.id}
-              className="guest-card"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <div className="guest-image">
-                <img src={guest.image} alt={guest.name} />
-              </div>
-              <h3>{guest.name}</h3>
-            </motion.div>
-            </a>
-          ))}
-        </div>
-      </div>
-
-      */}
-
-
-
     </section>
   );
 };
 
-export default FeaturedGuests; 
+export default FeaturedGuests;

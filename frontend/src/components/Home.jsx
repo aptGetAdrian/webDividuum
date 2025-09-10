@@ -5,12 +5,12 @@ import FeaturedGuests from './FeaturedGuests';
 
 const Home = () => {
   useDocumentTitle('Individuum Podcast');
-  
+
   return (
     <main>
       <Hero />
       <FeaturedGuests />
-      <Support />
+      <Support id="support" />
     </main>
   );
 };

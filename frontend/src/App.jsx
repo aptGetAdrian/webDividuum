@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
-import About from './components/About';
 import Footer from './components/Footer';
 import './index.css';
 import Hosts from './components/Hosts';
@@ -16,7 +15,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/o-podkastu" element={<Hosts />} />
+          <Route path="/o-podcastu" element={<Hosts />} />
           <Route path="/epizode" element={<Episodes/>} />
           <Route path="/kontakt" element={<Contact />} />
           <Route path="*" element={<NotFound />} />

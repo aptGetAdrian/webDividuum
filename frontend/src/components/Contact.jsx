@@ -141,7 +141,7 @@ const Contact = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1>PODPORA PROJEKTA</h1>
+          <h1>VSTOPITE V STIK Z NAMI</h1>
           <p className="contact-description">
             Imate vprašanje, predlog ali želite deliti svojo zgodbo? Pišite nam!
           </p>
