@@ -20,17 +20,17 @@ const FeaturedGuests = () => {
 
   const guests = [
     {
-      image: '/assets/guests/viktorMarkelj.png',
+      image: '/assets/guests/viktorMarkelj2.png',
       link: 'https://www.youtube.com/watch?v=NpdTZQ3u2_Q',
       description: '/assets/guests/viktorMarkelj_opis.png'
     },
     {
-      image: '/assets/guests/matejSkoliber.png',
+      image: '/assets/guests/matejSkoliber2.png',
       link: 'https://www.youtube.com/watch?v=ub_pnkapdxo',
       description: '/assets/guests/matejSkoliber_opis.png'
     },
     {
-      image: '/assets/guests/damijanJanzekovic.png',
+      image: '/assets/guests/damijanJanzekovic2.png',
       link: 'https://www.youtube.com/watch?v=AkM8cE0vj7c',
       description: '/assets/guests/damijanJanzekovic_opis.png'
     },
@@ -40,27 +40,27 @@ const FeaturedGuests = () => {
       description: '/assets/guests/gregaIvancic_opis.png'
     },
     {
-      image: '/assets/guests/ivanRihtaric.png',
+      image: '/assets/guests/ivanRihtaric2.png',
       link: 'https://www.youtube.com/watch?v=ptYK6YBr1hc',
       description: '/assets/guests/ivanRihtaric_opis.png'
     },
     {
-      image: '/assets/guests/alesMaver.png',
+      image: '/assets/guests/alesMaver2.png',
       link: 'https://www.youtube.com/watch?v=4W448Sls-yg',
       description: '/assets/guests/alesMaver_opis.png'
     },
     {
-      image: '/assets/guests/andrejStremfelj.png',
+      image: '/assets/guests/andrejStremfelj2.png',
       link: 'https://www.youtube.com/watch?v=Mm1Nveb-c44',
       description: '/assets/guests/andrejStremfelj_opis.png'
     },
     {
-      image: '/assets/guests/goranSrok.png',
+      image: '/assets/guests/goranSrok2.png',
       link: 'https://www.youtube.com/watch?v=jZTkqyXzgpI',
       description: '/assets/guests/goranSrok_opis.png'
     },
     {
-      image: '/assets/guests/igorPlohl.png',
+      image: '/assets/guests/igorPlohl2.png',
       link: 'https://www.youtube.com/watch?v=g8pRKA66VS0',
       description: '/assets/guests/igorPlohl_opis.png'
     },
@@ -90,7 +90,7 @@ const FeaturedGuests = () => {
           bend={0.4}
           textColor="#12353e"
           borderRadius={0.05}
-          scrollEase={isMobile ? 0.05 : 0.03}
+          scrollEase={isMobile ? 0.05 : 0.025}
           items={guests}
           font="bold 24px 'Comic Sans MS', cursive, sans-serif"
         />

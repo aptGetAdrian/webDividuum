@@ -1,9 +1,8 @@
 cleanej up CSS datoteke. mislim, da so tudi ene unused jsx datoteke
 probej nekej za background, wallpaper z ovimi fingerprinti, probej uprabiti to, kej ti patrik pošle
 
-- približej obraze pri ovih karticah
 - 3 sekunde ove goste text, ka se prikaze na mobile
-- popravi glitch na mobile, da se zvrti do konca, te pa komej ze spet zacne
+- popravi glitch na mobile, da se zvrti do konca, pa komej zacne, ko se na novo zazna scrolling
 
 - rewrite backend, da mas eno datoteko z vsemi informacijami, ki se prepise nekda ponoci enkrat na dan
-  in te na podlagi tega loadej videe, ker drugaci prevec dugo treba
+  in te na podlagi tega loadej videe, ker drugaci prevec dugo treba. al pa enkrat na vuro

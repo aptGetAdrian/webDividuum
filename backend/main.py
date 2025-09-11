@@ -120,6 +120,19 @@ def fetch_all_videos():
             total_seconds = parse_duration(duration)
             if total_seconds > 60:
                 main_episodes.append(video)
+
+        if os.path.isfile("videoData.txt"):
+            os.remove("videoData.txt")
+
+        outFile = open("videoData.txt", "w")
+        
+        for video in all_videos:
+            for element in video:
+                outFile.write(element)
+
+            outFile.write("\n")
+
+        outFile.close()
         
         return main_episodes
         
