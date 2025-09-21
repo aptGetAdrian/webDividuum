@@ -25,3 +25,7 @@ dist-ssr
 
 *.env
 
+# supporting backend files
+*.txt
+*.json
+

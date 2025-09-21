@@ -48,9 +48,9 @@ const Hero = () => {
   // Function to trigger the glitch animation
   const triggerGlitchAnimation = () => {
     if (isGlitchPlaying) return; // Prevent if already playing
-    
+
     setIsGlitchPlaying(true);
-    
+
     // Start the glitch effect
     glitch.startGlitch();
 
@@ -72,7 +72,7 @@ const Hero = () => {
       glitch.stopGlitch();
       clearInterval(switchInterval);
       setShowSecondImage(false); // Ensure we end on the first image
-      
+
       // Allow glitch to be triggered again after a brief cooldown
       setTimeout(() => {
         setIsGlitchPlaying(false);
@@ -219,7 +219,14 @@ const Hero = () => {
       <section className="hero" ref={heroRef}>
         {/* Background Video or Fallback Image */}
         <div className="hero-background-video">
-          {!videoError ? (
+          {videoError ? (
+            // Show fallback image when video errors
+            <img
+              src="/assets/videoplayback.00_15_09_07.Still001.png"
+              alt="Background"
+              className="background-video"
+            />
+          ) : (
             <Suspense fallback={
               <div className="video-loading-placeholder">
                 <img
@@ -230,25 +237,19 @@ const Hero = () => {
               </div>
             }>
               {isMobile ? (
-                <LazyMobileVideo 
+                <LazyMobileVideo
                   onError={handleVideoError}
                   onLoad={() => setVideoLoaded(true)}
                   className={`background-video ${videoLoaded ? 'video-loaded' : 'video-loading'}`}
                 />
               ) : (
-                <LazyDesktopVideo 
+                <LazyDesktopVideo
                   onError={handleVideoError}
                   onLoad={() => setVideoLoaded(true)}
                   className={`background-video ${videoLoaded ? 'video-loaded' : 'video-loading'}`}
                 />
               )}
             </Suspense>
-          ) : (
-            <img
-              src="/assets/videoplayback.00_15_09_07.Still001.png"
-              alt="Background"
-              className="background-video"
-            />
           )}
         </div>
 
@@ -385,7 +386,7 @@ const Hero = () => {
                       </button>
                     </div>
                   ) : (
-                    <h3 style={{ color: '#bbbabaff', textAlign: 'center', marginTop: '55%'}}>Loading latest video... </h3>
+                    <h3 style={{ color: '#bbbabaff', textAlign: 'center', marginTop: '55%' }}>Loading latest video... </h3>
                   )}
                 </div>
               ) : showVideo ? (

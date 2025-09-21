@@ -4,6 +4,9 @@ import requests
 import os
 from dotenv import load_dotenv
 import logging
+import json
+import threading
+import time
 
 # Load environment variables
 load_dotenv()
@@ -29,6 +32,22 @@ TO_EMAIL = os.getenv('TO_EMAIL', 'individuumpodcast@gmail.com')
 if not YOUTUBE_API_KEY:
     logger.error("YOUTUBE_API_KEY not found in environment variables")
     raise ValueError("YOUTUBE_API_KEY must be set in environment variables")
+
+
+def background_scheduler():
+    """Background thread that runs fetch jobs every hour"""
+    while True:
+        try:
+            logger.info("Running scheduled YouTube data fetch...")
+            fetch_all_videos()
+            fetch_playlists()
+            fetch_and_cache_latest_video()
+            logger.info("Scheduled YouTube data fetch completed successfully")
+        except Exception as e:
+            logger.error(f"Error in scheduled YouTube data fetch: {e}")
+        
+        # Sleep for 30 minutes (1800 seconds)
+        time.sleep(1800)
 
 def parse_duration(duration_string):
     """Parse YouTube duration string (PT1H2M3S) and return total seconds"""
@@ -121,20 +140,12 @@ def fetch_all_videos():
             if total_seconds > 60:
                 main_episodes.append(video)
 
-        if os.path.isfile("videoData.txt"):
-            os.remove("videoData.txt")
+        if len(main_episodes) != 0:
+            if os.path.isfile("videos.json"):
+                os.remove("videos.json")
 
-        outFile = open("videoData.txt", "w")
-        
-        for video in all_videos:
-            for element in video:
-                outFile.write(element)
-
-            outFile.write("\n")
-
-        outFile.close()
-        
-        return main_episodes
+            with open('videos.json', 'w') as f:
+                json.dump(main_episodes, f)
         
     except requests.RequestException as e:
         logger.error(f"Error fetching videos: {e}")
@@ -236,7 +247,12 @@ def fetch_playlists():
                 logger.error(f"Unexpected error fetching playlist {playlist['id']}: {e}")
                 continue
         
-        return playlists_with_videos
+        if len(playlists_with_videos) != 0:
+            if os.path.isfile("playlists.json"):
+                os.remove("playlists.json")
+
+            with open('playlists.json', 'w') as f:
+                json.dump(playlists_with_videos, f)
         
     except requests.RequestException as e:
         logger.error(f"Error fetching playlists: {e}")
@@ -245,15 +261,156 @@ def fetch_playlists():
         logger.error(f"Unexpected error fetching playlists: {e}")
         return []
 
+def fetch_and_cache_latest_video():
+    """Fetch the latest video and cache it to a JSON file"""
+    try:
+        logger.info("Fetching latest video for caching...")
+        
+        # Get channel's uploads playlist
+        channel_url = f"https://www.googleapis.com/youtube/v3/channels"
+        channel_params = {
+            'key': YOUTUBE_API_KEY,
+            'id': CHANNEL_ID,
+            'part': 'contentDetails'
+        }
+        
+        channel_response = requests.get(channel_url, params=channel_params)
+        channel_response.raise_for_status()
+        channel_data = channel_response.json()
+        
+        if not channel_data.get('items'):
+            logger.error("No channel data found")
+            return None
+        
+        uploads_playlist_id = channel_data['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+        
+        # Get recent videos from uploads playlist
+        playlist_url = f"https://www.googleapis.com/youtube/v3/playlistItems"
+        playlist_params = {
+            'key': YOUTUBE_API_KEY,
+            'playlistId': uploads_playlist_id,
+            'part': 'snippet',
+            'maxResults': 30
+        }
+        
+        playlist_response = requests.get(playlist_url, params=playlist_params)
+        playlist_response.raise_for_status()
+        playlist_data = playlist_response.json()
+        
+        if not playlist_data.get('items'):
+            logger.error("No videos found in playlist")
+            return None
+        
+        # Get video IDs to check durations
+        video_ids = [item['snippet']['resourceId']['videoId'] for item in playlist_data['items']]
+        
+        # Fetch video details including duration
+        videos_url = f"https://www.googleapis.com/youtube/v3/videos"
+        videos_params = {
+            'key': YOUTUBE_API_KEY,
+            'id': ','.join(video_ids),
+            'part': 'contentDetails,snippet,statistics'
+        }
+        
+        videos_response = requests.get(videos_url, params=videos_params)
+        videos_response.raise_for_status()
+        videos_data = videos_response.json()
+        
+        # Filter out Shorts (videos under 61 seconds) and find the latest main video
+        latest_main_video = None
+        for video in videos_data.get('items', []):
+            duration = video.get('contentDetails', {}).get('duration', '')
+            total_seconds = parse_duration(duration)
+            
+            if total_seconds > 120:  # Filter out Shorts
+                latest_main_video = video
+                break  # First one is the latest
+        
+        if not latest_main_video:
+            logger.error("No main videos found (all are shorts)")
+            return None
+        
+        # Prepare video data
+        video_id = latest_main_video['id']
+        snippet = latest_main_video['snippet']
+        statistics = latest_main_video.get('statistics', {})
+        
+        video_data = {
+            'id': video_id,
+            'title': snippet['title'],
+            'description': snippet['description'],
+            'thumbnail': (
+                snippet['thumbnails'].get('maxres', {}).get('url') or
+                snippet['thumbnails'].get('high', {}).get('url') or
+                snippet['thumbnails'].get('medium', {}).get('url') or
+                snippet['thumbnails'].get('default', {}).get('url')
+            ),
+            'publishedAt': snippet['publishedAt'],
+            'viewCount': statistics.get('viewCount', '0'),
+            'likeCount': statistics.get('likeCount', '0'),
+            'commentCount': statistics.get('commentCount', '0'),
+            'duration': latest_main_video['contentDetails']['duration'],
+        }
+        
+        # Cache to JSON file
+        cache_data = {
+            'videoId': video_id,
+            'videoData': video_data,
+        }
+        
+        with open('latest_video.json', 'w', encoding='utf-8') as f:
+            json.dump(cache_data, f, indent=2, ensure_ascii=False)
+        
+        logger.info(f"Cached latest video: {video_data['title']}")
+        return cache_data
+        
+    except Exception as e:
+        logger.error(f"Error fetching and caching latest video: {e}")
+        return None
+
 @app.route('/api/youtube-data', methods=['GET'])
 def get_youtube_data():
     """Main endpoint to get all YouTube data"""
     try:
         logger.info("Fetching YouTube data...")
         
-        # Fetch episodes and playlists
-        episodes = fetch_all_videos()
-        playlists = fetch_playlists()
+        episodes = ""
+        playlists = ""
+
+        if os.path.exists("videos.json"):
+            with open("videos.json", 'r', encoding='utf-8') as file:
+                content = file.read()
+                if content.strip():  # Check if file is not empty
+                    try:
+                        episodes = json.loads(content)
+                        print("Successfully loaded videos.json")
+                    except json.JSONDecodeError:
+                        print("Error: videos.json contains invalid JSON")
+                        episodes = None
+                else:
+                    print("Error: videos.json is empty")
+                    episodes = None
+        else:
+            print("Error: videos.json was not found")
+            episodes = None
+
+        # Check if playlists.json exists and is valid JSON
+        if os.path.exists("playlists.json"):
+            with open("playlists.json", 'r', encoding='utf-8') as file:
+                content = file.read()
+                if content.strip():  # Check if file is not empty
+                    try:
+                        playlists = json.loads(content)
+                        print("Successfully loaded playlists.json")
+                    except json.JSONDecodeError:
+                        print("Error: playlists.json contains invalid JSON")
+                        playlists = None
+                else:
+                    print("Error: playlists.json is empty")
+                    playlists = None
+        else:
+            print("Error: playlists.json was not found")
+            playlists = None        
         
         response_data = {
             'episodes': episodes,
@@ -273,114 +430,37 @@ def get_youtube_data():
 
 @app.route('/api/latest-video', methods=['GET'])
 def get_latest_video():
-    """Get the latest main video (not a short) from the channel"""
+    """Get the latest main video from cached JSON file"""
     try:
-        logger.info("Fetching latest video...")
+        cache_file = 'latest_video.json'
         
-        # Get channel's uploads playlist
-        channel_url = f"https://www.googleapis.com/youtube/v3/channels"
-        channel_params = {
-            'key': YOUTUBE_API_KEY,
-            'id': CHANNEL_ID,
-            'part': 'contentDetails'
-        }
+        if not os.path.exists(cache_file):
+            logger.warning("Latest video cache not found, fetching fresh data...")
+            result = fetch_and_cache_latest_video()
+            if not result:
+                return jsonify({'error': 'No latest video found'}), 404
+            return jsonify(result)
         
-        channel_response = requests.get(channel_url, params=channel_params)
-        channel_response.raise_for_status()
-        channel_data = channel_response.json()
+        # Read from cache
+        with open(cache_file, 'r', encoding='utf-8') as f:
+            cache_data = json.load(f)
+
+        logger.info(f"Returning cached latest video: {cache_data['videoData']['title']}")
+        return jsonify(cache_data)
         
-        if not channel_data.get('items'):
-            logger.error("No channel data found")
-            return jsonify({'error': 'Channel not found'}), 404
+    except json.JSONDecodeError:
+        logger.error("Invalid JSON in cache file, fetching fresh data...")
+        result = fetch_and_cache_latest_video()
+        if result:
+            return jsonify(result)
+        return jsonify({'error': 'Failed to fetch latest video'}), 500
         
-        uploads_playlist_id = channel_data['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-        
-        # Get recent videos from uploads playlist
-        playlist_url = f"https://www.googleapis.com/youtube/v3/playlistItems"
-        playlist_params = {
-            'key': YOUTUBE_API_KEY,
-            'playlistId': uploads_playlist_id,
-            'part': 'snippet',
-            'maxResults': 30
-        }
-        
-        playlist_response = requests.get(playlist_url, params=playlist_params)
-        playlist_response.raise_for_status()
-        playlist_data = playlist_response.json()
-        
-        if not playlist_data.get('items'):
-            logger.error("No videos found in playlist")
-            return jsonify({'error': 'No videos found'}), 404
-        
-        # Get video IDs to check durations
-        video_ids = [item['snippet']['resourceId']['videoId'] for item in playlist_data['items']]
-        
-        # Fetch video details including duration
-        videos_url = f"https://www.googleapis.com/youtube/v3/videos"
-        videos_params = {
-            'key': YOUTUBE_API_KEY,
-            'id': ','.join(video_ids),
-            'part': 'contentDetails,snippet'
-        }
-        
-        videos_response = requests.get(videos_url, params=videos_params)
-        videos_response.raise_for_status()
-        videos_data = videos_response.json()
-        
-        # Filter out Shorts (videos under 61 seconds)
-        main_videos = []
-        for video in videos_data.get('items', []):
-            duration = video.get('contentDetails', {}).get('duration', '')
-            total_seconds = parse_duration(duration)
-            
-            # Debug logging
-            logger.info(f"Video: {video['snippet']['title'][:50]}... Duration: {duration} -> {total_seconds}s")
-            
-            if total_seconds > 120:  # Filter out Shorts
-                main_videos.append(video)
-                break
-        
-        logger.info(f"Found {len(main_videos)} main videos out of {len(videos_data.get('items', []))} total videos")
-        
-        if not main_videos:
-            logger.error("No main videos found (all are shorts)")
-            return jsonify({'error': 'No main videos found'}), 404
-        
-        # Get the latest main video (first in the filtered list)
-        latest_video = main_videos[0]
-        video_id = latest_video['id']
-        snippet = latest_video['snippet']
-        
-        video_data = {
-            'id': video_id,
-            'title': snippet['title'],
-            'description': snippet['description'],
-            'thumbnail': (
-                snippet['thumbnails'].get('maxres', {}).get('url') or
-                snippet['thumbnails'].get('high', {}).get('url') or
-                snippet['thumbnails'].get('medium', {}).get('url') or
-                snippet['thumbnails'].get('default', {}).get('url')
-            ),
-            'publishedAt': snippet['publishedAt']
-        }
-        
-        response_data = {
-            'videoId': video_id,
-            'videoData': video_data
-        }
-        
-        logger.info(f"Successfully fetched latest video: {video_data['title']}")
-        return jsonify(response_data)
-        
-    except requests.RequestException as e:
-        logger.error(f"Request error in get_latest_video: {e}")
-        return jsonify({
-            'error': 'Failed to fetch video data from YouTube',
-            'videoId': None,
-            'videoData': None
-        }), 500
     except Exception as e:
         logger.error(f"Unexpected error in get_latest_video: {e}")
+        # Try to fetch fresh data as fallback
+        result = fetch_and_cache_latest_video()
+        if result:
+            return jsonify(result)
         return jsonify({
             'error': 'Internal server error',
             'videoId': None,
@@ -402,10 +482,20 @@ def internal_error(error):
 
 
 if __name__ == '__main__':
+
     # Check if required environment variables are set
     if not YOUTUBE_API_KEY:
         logger.error("YOUTUBE_API_KEY is required")
         exit(1)
+
+    fetch_all_videos()
+    fetch_playlists()
+    fetch_and_cache_latest_video()
+
+    # Start background scheduler thread
+    scheduler_thread = threading.Thread(target=background_scheduler, daemon=True)
+    scheduler_thread.start()
+    logger.info("Background scheduler thread started - will run every hour")
     
     logger.info("Starting YouTube API server...")
     logger.info(f"Using Channel ID: {CHANNEL_ID}")

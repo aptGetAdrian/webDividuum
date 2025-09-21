@@ -1,3 +1,4 @@
+// LazyDesktopVideo.jsx
 import { useEffect, useRef } from 'react';
 
 const LazyDesktopVideo = ({ onError, onLoad, className }) => {
@@ -6,16 +7,20 @@ const LazyDesktopVideo = ({ onError, onLoad, className }) => {
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      video.addEventListener('loadeddata', onLoad);
-      video.addEventListener('error', onError);
+      const handleLoad = () => onLoad?.();
+      const handleError = () => onError?.();
+      
+      video.addEventListener('loadeddata', handleLoad);
+      video.addEventListener('error', handleError);
       
       return () => {
-        video.removeEventListener('loadeddata', onLoad);
-        video.removeEventListener('error', onError);
+        video.removeEventListener('loadeddata', handleLoad);
+        video.removeEventListener('error', handleError);
       };
     }
   }, [onLoad, onError]);
 
+  // Add onError directly to the video element as well
   return (
     <video
       ref={videoRef}
@@ -26,6 +31,7 @@ const LazyDesktopVideo = ({ onError, onLoad, className }) => {
       webkit-playsinline="true"
       preload="auto"
       className={className}
+      onError={onError} // Add this line
     >
       <source
         src="/assets/desktop-video.mp4"

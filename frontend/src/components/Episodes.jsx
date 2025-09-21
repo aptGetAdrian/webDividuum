@@ -357,7 +357,7 @@ const Episodes = () => {
                         margin: '0 auto'
                       }}>
                         {playlist.videos.map((episode, index) =>
-                          renderEpisodeCard(episode, playlistIndex * 10 + index)
+                          renderEpisodeCard(episode, playlistIndex * 3 + index)
                         )}
                       </div>
                     </motion.div>

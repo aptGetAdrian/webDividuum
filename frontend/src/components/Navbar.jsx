@@ -43,7 +43,7 @@ const Navbar = () => {
           // Scrolling up - show navbar
           setShowNavbar(true);
         }
-        
+
         setLastScrollY(scrollPosition);
       }
     };
@@ -74,8 +74,26 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
+  const handleNavLinkClick = (e, path) => {
+    e.preventDefault();
+    
+    if (location.pathname === path) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      setIsOpen(false);
+      return;
+    }
+    
+    navigate(path);
+    
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }, 100);
+    
+    setIsOpen(false);
+  };
+
   return (
-    <nav 
+    <nav
       ref={navbarRef}
       className={`navbar ${isScrolled ? 'scrolled' : ''} ${showNavbar ? 'visible' : 'hidden'}`}
     >
@@ -86,36 +104,56 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0 }}
           >
-            <Link to="/"> <img
-              src="/assets/titleImage.png"
-              alt="Domov"
-              style={{
-                display: 'block',
-                width: '2rem',
-                height: 'auto',
-              }}
-            /></Link>
+            <Link
+              to="/"
+              onClick={(e) => handleNavLinkClick(e, "/")}
+            >
+              <img
+                src="/assets/titleImage.png"
+                alt="Domov"
+                style={{
+                  display: 'block',
+                  width: '2rem',
+                  height: 'auto',
+                }}
+              />
+            </Link>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <Link to="/epizode">Epizode</Link>
+            <Link
+              to="/epizode"
+              onClick={(e) => handleNavLinkClick(e, "/epizode")}
+            >
+              Epizode
+            </Link>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Link to="/o-podcastu">O podcastu</Link>
+            <Link
+              to="/o-podcastu"
+              onClick={(e) => handleNavLinkClick(e, "/o-podcastu")}
+            >
+              O podcastu
+            </Link>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Link to="/kontakt">Kontakt</Link>
+            <Link
+              to="/kontakt"
+              onClick={(e) => handleNavLinkClick(e, "/kontakt")}
+            >
+              Kontakt
+            </Link>
           </motion.div>
 
           <motion.div
