@@ -1,11 +1,35 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import emailjs from 'emailjs-com';
+import Particles from "react-tsparticles";
+import { loadSlim } from "tsparticles-slim";
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import './Contact.css';
 
+// Timer component to show seconds left without re-rendering the entire form
+const RateLimitTimer = ({ resetTime }) => {
+  const [secondsLeft, setSecondsLeft] = useState(0);
+
+  useEffect(() => {
+    if (!resetTime) return;
+
+    const update = () => {
+      setSecondsLeft(Math.max(0, Math.ceil((resetTime - Date.now()) / 1000)));
+    };
+
+    update(); // initial run
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [resetTime]);
+
+  if (secondsLeft <= 0) return null;
+  return <>{`Počakajte ${secondsLeft}s`}</>;
+};
+
 const Contact = () => {
   useDocumentTitle('Individuum kontakt');
+
+  const [particlesLoaded2, setParticlesLoaded] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -25,42 +49,84 @@ const Contact = () => {
   });
 
   // Rate limiting configuration
-  const RATE_LIMIT = 2; // messages per minute
-  const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
+  const RATE_LIMIT = 2;
+  const RATE_LIMIT_WINDOW = 60 * 1000;
   const STORAGE_KEY = 'contact_form_submissions';
 
-  // Check rate limit on component mount and set up cleanup
+  const particlesLoaded = (container) => {
+    setParticlesLoaded(true);
+  };
+
+  // Initialize particles
+  const particlesInit = async (engine) => {
+    await loadSlim(engine);
+  };
+
+  // Particles configuration (unchanged)
+  const particlesOptions = {
+    background: { color: { value: "transparent" } },
+    fullScreen: { enable: false, zIndex: 1 },
+    fpsLimit: 60,
+    particles: {
+      color: { value: "#2e9cddff" },
+      links: { enable: false },
+      move: {
+        direction: "none",
+        enable: true,
+        outModes: { default: "out" },
+        random: true,
+        speed: 0.25,
+        straight: false,
+      },
+      number: {
+        density: { enable: true, area: 800 },
+        value: 150,
+      },
+      opacity: {
+        value: { min: 0.1, max: 0.7 },
+        animation: { enable: true, speed: 0.3, minimumValue: 0.1, sync: false }
+      },
+      shape: { type: "circle" },
+      size: { value: { min: 0.5, max: 2 } },
+    },
+    detectRetina: true,
+  };
+
+  // Memoized particles so they don’t re-render
+  const particlesMemo = useMemo(() => (
+    <Particles
+      id="tsparticles"
+      init={particlesInit}
+      loaded={particlesLoaded2}
+      options={particlesOptions}
+    />
+  ), []); // empty deps — created once
+
+  // Check rate limit on mount
   useEffect(() => {
     checkRateLimit();
-    const interval = setInterval(checkRateLimit, 1000); // Check every second
+    const interval = setInterval(checkRateLimit, 5000); // check every 5 seconds
     return () => clearInterval(interval);
   }, []);
 
   const checkRateLimit = () => {
     const now = Date.now();
     const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    
-    // Filter out submissions older than rate limit window
     const recentSubmissions = submissions.filter(
       timestamp => now - timestamp < RATE_LIMIT_WINDOW
     );
-    
-    // Update localStorage with filtered submissions
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(recentSubmissions));
-    
+
     const remaining = Math.max(0, RATE_LIMIT - recentSubmissions.length);
     const isBlocked = remaining === 0;
-    
+
     let resetTime = null;
     if (isBlocked && recentSubmissions.length > 0) {
       resetTime = recentSubmissions[0] + RATE_LIMIT_WINDOW;
     }
-    
-    setRateLimitInfo({
-      remaining,
-      resetTime,
-      isBlocked
-    });
+
+    setRateLimitInfo({ remaining, resetTime, isBlocked });
   };
 
   const addSubmissionTimestamp = () => {
@@ -70,28 +136,18 @@ const Contact = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
   };
 
-  const getTimeUntilReset = () => {
-    if (!rateLimitInfo.resetTime) return 0;
-    return Math.max(0, Math.ceil((rateLimitInfo.resetTime - Date.now()) / 1000));
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check rate limit before submitting
+
     if (rateLimitInfo.isBlocked) {
-      const timeLeft = getTimeUntilReset();
       setStatus({
         type: 'error',
-        message: `Preveč zahtev. Poskusite ponovno čez ${timeLeft} sekund.`
+        message: 'Preveč zahtev. Prosimo, poskusite kasneje.'
       });
       return;
     }
@@ -99,7 +155,7 @@ const Contact = () => {
     setStatus({ type: 'loading', message: 'Pošiljanje...' });
 
     try {
-      const result = await emailjs.send(
+      await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         {
@@ -110,20 +166,15 @@ const Contact = () => {
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY
       );
 
-      // Add timestamp after successful submission
       addSubmissionTimestamp();
-      checkRateLimit(); // Update rate limit info immediately
+      checkRateLimit();
 
       setStatus({
         type: 'success',
         message: 'Sporočilo uspešno poslano! Hvala za vaše sporočilo.'
       });
 
-      setFormData({
-        name: '',
-        subject: '',
-        message: ''
-      });
+      setFormData({ name: '', subject: '', message: '' });
     } catch (error) {
       setStatus({
         type: 'error',
@@ -134,8 +185,13 @@ const Contact = () => {
 
   return (
     <section className="contact-section">
+      {/* Particles Background */}
+      <div className="particles-container">
+        {particlesMemo}
+      </div>
+
       <div className="container">
-        <motion.div 
+        <motion.div
           className="contact-content"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -186,18 +242,16 @@ const Contact = () => {
               />
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className={`submit-button ${status.type === 'loading' ? 'loading' : ''} ${rateLimitInfo.isBlocked ? 'disabled' : ''}`}
               disabled={status.type === 'loading' || rateLimitInfo.isBlocked}
             >
-              {rateLimitInfo.isBlocked 
-                ? `Počakajte ${getTimeUntilReset()}s` 
-                : 'Pošlji sporočilo'
-              }
+              {rateLimitInfo.isBlocked
+                ? <RateLimitTimer resetTime={rateLimitInfo.resetTime} />
+                : 'Pošlji sporočilo'}
             </button>
 
-            {/* Rate limit info */}
             {rateLimitInfo.remaining < 2 && !rateLimitInfo.isBlocked && (
               <div className="rate-limit-warning">
                 Še {rateLimitInfo.remaining} sporočil{rateLimitInfo.remaining === 1 ? 'o' : 'i'} to minuto
@@ -205,7 +259,7 @@ const Contact = () => {
             )}
 
             {status.message && (
-              <motion.div 
+              <motion.div
                 className={`status-message ${status.type}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

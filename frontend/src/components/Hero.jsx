@@ -220,17 +220,24 @@ const Hero = () => {
         {/* Background Video or Fallback Image */}
         <div className="hero-background-video">
           {videoError ? (
-            // Show fallback image when video errors
-            <img
-              src="/assets/videoplayback.00_15_09_07.Still001.png"
-              alt="Background"
-              className="background-video"
-            />
+            isMobile ? (
+              <img
+                src="/assets/fallback-mobile.png"
+                alt="Background"
+                className="background-video"
+              />
+            ) : (
+              <img
+                src="/assets/fallback.png"
+                alt="Background"
+                className="background-video"
+              />
+            )
           ) : (
             <Suspense fallback={
               <div className="video-loading-placeholder">
                 <img
-                  src="/assets/videoplayback.00_15_09_07.Still001.png"
+                  src="/assets/fallback.png"
                   alt="Background"
                   className="background-video"
                 />

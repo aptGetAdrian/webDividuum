@@ -1,10 +1,6 @@
-cleanej up CSS datoteke. mislim, da so tudi ene unused jsx datoteke
-probej nekej za background, wallpaper z ovimi fingerprinti, probej uprabiti to, kej ti patrik pošle
+- naredi SEO
 
-- 3 sekunde ove goste text, ka se prikaze na mobile
-
-- napravi novo fallback sliko za mobile pa jo dodej v hero.jsx
-- naredi slike za cards mejnse, bol optimized 
+13. 12. ob 13:00 uri, "prijatelji, pridite vsi"
 
 
-- popravi glitch na mobile, da se zvrti do konca, pa komej zacne, ko se na novo zazna scrolling
+"assets/titleImage.png"
