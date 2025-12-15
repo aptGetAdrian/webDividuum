@@ -5,6 +5,7 @@ import { loadSlim } from "tsparticles-slim";
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import './Hosts.css';
 import ProfileCard from '/src/blocks/Components/ProfileCard/ProfileCard';
+import { Helmet } from 'react-helmet-async';
 
 const Hosts = () => {
   useDocumentTitle('O podkastu');
@@ -59,6 +60,15 @@ const Hosts = () => {
   ), []);
 
   return (
+    <>
+    <Helmet>
+            <title>Individuum Podcast | O podkastu</title>
+            <meta
+              name="description"
+              content="Vodita ga Lan in Patrik, raziskujeta edinstvene zgodbe, poglede in izkušnje posameznikov. Spoznajte gostitelja in ekipo."
+            />
+            <link rel="canonical" href="/o-podcastu" />
+          </Helmet>
     <section className="hosts section">
       {/* Particle Background */}
       <div className="particles-container">
@@ -202,6 +212,7 @@ const Hosts = () => {
       </div>
 
     </section>
+    </>
   );
 };
 

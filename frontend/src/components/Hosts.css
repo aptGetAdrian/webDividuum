@@ -45,6 +45,7 @@
   border-radius: 20px;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  margin-top: 6vh;
 }
 
 .podcast-title {
@@ -165,6 +166,7 @@ h3 {
   .podcast-description {
     margin: 0 1rem 4rem 1rem;
     padding: 2rem;
+    margin-top: 6vh;
   }
 
   .podcast-title {

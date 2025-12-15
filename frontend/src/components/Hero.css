@@ -818,3 +818,91 @@
   position: relative;
   z-index: 2;
 }
+
+
+/* ===== MOBILE LOADER SCREEN ===== */
+.mobile-loader-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: linear-gradient(135deg, var(--dark-bg) 0%, rgb(42, 113, 133) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-color);
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.6s ease-in-out;
+  animation: fadeInLoader 0.8s ease-out forwards;
+}
+
+.mobile-loader-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader-content {
+  text-align: center;
+  animation: float 3s ease-in-out infinite;
+}
+
+.loader-content img {
+  width: 70%;
+  max-width: 280px;
+  border-radius: 10px;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 25px rgba(42, 113, 133, 0.5));
+  margin-bottom: 1.5rem;
+  animation: pulseGlow 2.2s ease-in-out infinite;
+}
+
+.loader-content p {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  animation: fadeText 2.4s ease-in-out infinite;
+}
+
+/* Subtle rotating spinner accent (coffee color tone) */
+.loader-spinner {
+  border: 3px solid rgba(255, 221, 68, 0.3);
+  border-top-color: var(--coffee-color);
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  margin: 1.2rem auto 0;
+  animation: spin 1.2s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 221, 68, 0.3));
+}
+
+/* Animations */
+@keyframes fadeInLoader {
+  from { opacity: 0; transform: scale(1.02); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { filter: drop-shadow(0 0 25px rgba(42, 113, 133, 0.3)); opacity: 0.9; }
+  50% { filter: drop-shadow(0 0 40px rgba(255, 221, 68, 0.5)); opacity: 1; }
+}
+
+@keyframes fadeText {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .loader-content img {
+    max-width: 220px;
+  }
+  .loader-content p {
+    font-size: 1rem;
+  }
+  .loader-spinner {
+    width: 35px;
+    height: 35px;
+  }
+}

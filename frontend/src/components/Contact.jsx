@@ -5,6 +5,7 @@ import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import './Contact.css';
+import { Helmet } from 'react-helmet-async';
 
 // Timer component to show seconds left without re-rendering the entire form
 const RateLimitTimer = ({ resetTime }) => {
@@ -184,94 +185,105 @@ const Contact = () => {
   };
 
   return (
-    <section className="contact-section">
-      {/* Particles Background */}
-      <div className="particles-container">
-        {particlesMemo}
-      </div>
+    <>
+      <Helmet>
+        <title>Individuum Podcast | Kontakt</title>
+        <meta
+          name="description"
+          content="Stopite v stik z nami! Posredujte vprašanja, predloge ali delite svojo zgodbo z Individuum podcast ekipo."
+        />
+        <link rel="canonical" href="/kontakt" />
+      </Helmet>
 
-      <div className="container">
-        <motion.div
-          className="contact-content"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1>VSTOPITE V STIK Z NAMI</h1>
-          <p className="contact-description">
-            Imate vprašanje, predlog ali želite deliti svojo zgodbo? Pišite nam!
-          </p>
+      <section className="contact-section">
+        {/* Particles Background */}
+        <div className="particles-container">
+          {particlesMemo}
+        </div>
 
-          <form onSubmit={handleSubmit} className="contact-form">
-            <div className="form-group">
-              <label htmlFor="name">Ime in priimek</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                placeholder="Vnesite vaše ime in priimek"
-              />
-            </div>
+        <div className="container">
+          <motion.div
+            className="contact-content"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1>VSTOPITE V STIK Z NAMI</h1>
+            <p className="contact-description">
+              Imate vprašanje, predlog ali želite deliti svojo zgodbo? Pišite nam!
+            </p>
 
-            <div className="form-group">
-              <label htmlFor="subject">Zadeva</label>
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-                placeholder="Vnesite zadevo sporočila"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="message">Sporočilo</label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                placeholder="Napišite vaše sporočilo"
-                rows="6"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className={`submit-button ${status.type === 'loading' ? 'loading' : ''} ${rateLimitInfo.isBlocked ? 'disabled' : ''}`}
-              disabled={status.type === 'loading' || rateLimitInfo.isBlocked}
-            >
-              {rateLimitInfo.isBlocked
-                ? <RateLimitTimer resetTime={rateLimitInfo.resetTime} />
-                : 'Pošlji sporočilo'}
-            </button>
-
-            {rateLimitInfo.remaining < 2 && !rateLimitInfo.isBlocked && (
-              <div className="rate-limit-warning">
-                Še {rateLimitInfo.remaining} sporočil{rateLimitInfo.remaining === 1 ? 'o' : 'i'} to minuto
+            <form onSubmit={handleSubmit} className="contact-form">
+              <div className="form-group">
+                <label htmlFor="name">Ime in priimek</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="Vnesite vaše ime in priimek"
+                />
               </div>
-            )}
 
-            {status.message && (
-              <motion.div
-                className={`status-message ${status.type}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+              <div className="form-group">
+                <label htmlFor="subject">Zadeva</label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  placeholder="Vnesite zadevo sporočila"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="message">Sporočilo</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  placeholder="Napišite vaše sporočilo"
+                  rows="6"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className={`submit-button ${status.type === 'loading' ? 'loading' : ''} ${rateLimitInfo.isBlocked ? 'disabled' : ''}`}
+                disabled={status.type === 'loading' || rateLimitInfo.isBlocked}
               >
-                {status.message}
-              </motion.div>
-            )}
-          </form>
-        </motion.div>
-      </div>
-    </section>
+                {rateLimitInfo.isBlocked
+                  ? <RateLimitTimer resetTime={rateLimitInfo.resetTime} />
+                  : 'Pošlji sporočilo'}
+              </button>
+
+              {rateLimitInfo.remaining < 2 && !rateLimitInfo.isBlocked && (
+                <div className="rate-limit-warning">
+                  Še {rateLimitInfo.remaining} sporočil{rateLimitInfo.remaining === 1 ? 'o' : 'i'} to minuto
+                </div>
+              )}
+
+              {status.message && (
+                <motion.div
+                  className={`status-message ${status.type}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {status.message}
+                </motion.div>
+              )}
+            </form>
+          </motion.div>
+        </div>
+      </section>
+    </>
   );
 };
 

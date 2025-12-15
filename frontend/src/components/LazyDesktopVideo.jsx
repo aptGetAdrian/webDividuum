@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 
 const LazyDesktopVideo = ({ onError, onLoad, className }) => {
   const videoRef = useRef(null);
+  const DESKTOP_VIDEO = import.meta.env.VITE_DESKTOP_VIDEO
   
   useEffect(() => {
     const video = videoRef.current;
@@ -29,12 +30,13 @@ const LazyDesktopVideo = ({ onError, onLoad, className }) => {
       loop
       playsInline
       webkit-playsinline="true"
-      preload="auto"
+      preload="metadata"
       className={className}
       onError={onError} // Add this line
+      poster="/public/fallback.png"
     >
       <source
-        src="/assets/desktop-video.mp4"
+        src={DESKTOP_VIDEO}
         type="video/mp4"
       />
     </video>

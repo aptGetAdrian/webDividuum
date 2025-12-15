@@ -1,29 +1,27 @@
-// LazyMobileVideo.jsx
-import { useEffect, useRef } from 'react';
+import { useEffect, forwardRef } from 'react';
 
-const LazyMobileVideo = ({ onError, onLoad, className }) => {
-  const videoRef = useRef(null);
-  
+const LazyMobileVideo = forwardRef(({ onError, onLoad, className }, ref) => {
+  const MOBILE_VIDEO = import.meta.env.VITE_MOBILE_VIDEO;
+
   useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      const handleLoad = () => onLoad?.();
-      const handleError = () => onError?.();
-      
-      video.addEventListener('loadeddata', handleLoad);
-      video.addEventListener('error', handleError);
-      
-      return () => {
-        video.removeEventListener('loadeddata', handleLoad);
-        video.removeEventListener('error', handleError);
-      };
-    }
-  }, [onLoad, onError]);
+    if (!ref || !ref.current) return;
+    const video = ref.current;
 
-  // Add onError directly to the video element as well
+    const handleLoad = () => onLoad?.();
+    const handleError = () => onError?.();
+
+    video.addEventListener('loadeddata', handleLoad);
+    video.addEventListener('error', handleError);
+
+    return () => {
+      video.removeEventListener('loadeddata', handleLoad);
+      video.removeEventListener('error', handleError);
+    };
+  }, [ref, onLoad, onError]);
+
   return (
     <video
-      ref={videoRef}
+      ref={ref}
       autoPlay
       muted
       loop
@@ -31,14 +29,13 @@ const LazyMobileVideo = ({ onError, onLoad, className }) => {
       webkit-playsinline="true"
       preload="auto"
       className={className}
-      onError={onError} // Add this line
+      onError={onError}
+      poster="/assets/fallback-mobile.png"
+      style={{ backgroundColor: 'black' }}
     >
-      <source
-        src="/assets/mobile-video.mp4"
-        type="video/mp4"
-      />
+      <source src={MOBILE_VIDEO} type="video/mp4" />
     </video>
   );
-};
+});
 
 export default LazyMobileVideo;

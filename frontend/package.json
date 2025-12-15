@@ -9,6 +9,11 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "reactSnap": {
+    "inlineCss": true,
+    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
+    "include": ["/", "/o-podcastu", "/epizode", "/kontakt"]
+  },
   "dependencies": {
     "emailjs-com": "^3.2.0",
     "framer-motion": "^12.12.2",
@@ -21,6 +26,7 @@
     "react-powerglitch": "^1.1.0",
     "react-router-dom": "^7.6.0",
     "react-router-hash-link": "^2.4.3",
+    "react-snap": "^1.23.0",
     "react-tsparticles": "^2.12.2",
     "tsparticles": "^3.9.1",
     "tsparticles-slim": "^2.12.0"

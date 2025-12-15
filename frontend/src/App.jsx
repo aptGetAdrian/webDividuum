@@ -19,7 +19,7 @@ function App() {
 
           <meta
             name="description"
-            content="Individuum podcast raziskuje navdihujoče življenjske zgodbe, edinstvene poglede in izkušnje posameznikov, ki izstopajo po svojem znanju, idejah ter podjetniški miselnosti. Pogovarjamo se o podjetništvu, filozofiji, športu, zgodovini, duhovnosti in mladostništvu..."
+            content="Individuum podcast raziskuje navdihujoče življenjske zgodbe, edinstvene poglede in izkušnje posameznikov, ki izstopajo po svojem znanju, idejah ter podjetniški miselnosti. Pogovarjamo se o podjetništvu, filozofiji, zgodovini in mladostništvu..."
           />
 
           <meta
