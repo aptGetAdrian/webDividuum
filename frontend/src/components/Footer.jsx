@@ -44,7 +44,7 @@ const Footer = () => {
   const sitePages = [
     { name: 'Domov', path: '/' },
     { name: 'Epizode', path: '/epizode' },
-    { name: 'O podkastu', path: '/o-podkastu' },
+    { name: 'O podkastu', path: '/o-podcastu' },
     { name: 'Kontakt', path: '/kontakt' }
   ];
 
