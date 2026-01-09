@@ -34,6 +34,7 @@ const Contact = () => {
 
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     subject: '',
     message: ''
   });
@@ -161,6 +162,7 @@ const Contact = () => {
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         {
           name: formData.name,
+          email: formData.email,
           subject: formData.subject,
           message: formData.message,
         },
@@ -175,7 +177,7 @@ const Contact = () => {
         message: 'Sporočilo uspešno poslano! Hvala za vaše sporočilo.'
       });
 
-      setFormData({ name: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
       setStatus({
         type: 'error',
@@ -224,6 +226,19 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   placeholder="Vnesite vaše ime in priimek"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email">E-pošta</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="Vnesite vaš e-poštni naslov"
                 />
               </div>
 
