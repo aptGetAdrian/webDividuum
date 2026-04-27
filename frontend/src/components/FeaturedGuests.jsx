@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import './FeaturedGuests.css';
-import CircularGallery from '/src/blocks/Components/CircularGallery/CircularGallery.jsx'
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import "./FeaturedGuests.css";
+import CircularGallery from "/src/blocks/Components/CircularGallery/CircularGallery.jsx";
 
 const FeaturedGuests = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -13,64 +13,88 @@ const FeaturedGuests = () => {
 
     checkIfMobile();
 
-    window.addEventListener('resize', checkIfMobile);
+    window.addEventListener("resize", checkIfMobile);
 
-    return () => window.removeEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
   const guests = [
     {
-      image: '/assets/guests/viktorMarkelj2.png',
-      link: 'https://www.youtube.com/watch?v=NpdTZQ3u2_Q',
-      description: '/assets/guests/viktorMarkelj_opis.png'
+      image: "/assets/guests/dejanZavec.png",
+      link: "https://www.youtube.com/watch?v=2O3BO2vq6Xk",
+      description: "/assets/guests/dejanZavec_opis.png",
     },
     {
-      image: '/assets/guests/matejSkoliber2.png',
-      link: 'https://www.youtube.com/watch?v=ub_pnkapdxo',
-      description: '/assets/guests/matejSkoliber_opis.png'
+      image: "/assets/guests/viktorMarkelj2.png",
+      link: "https://www.youtube.com/watch?v=NpdTZQ3u2_Q",
+      description: "/assets/guests/viktorMarkelj_opis.png",
     },
     {
-      image: '/assets/guests/damijanJanzekovic2.png',
-      link: 'https://www.youtube.com/watch?v=AkM8cE0vj7c',
-      description: '/assets/guests/damijanJanzekovic_opis.png'
+      image: "/assets/guests/polonaKovac.png",
+      link: "https://www.youtube.com/watch?v=hyObyUGyQAM",
+      description: "/assets/guests/polonaKovac_opis.png",
     },
     {
-      image: '/assets/guests/gregaIvancic.png',
-      link: 'https://www.youtube.com/watch?v=XJ8QTTpcj5E',
-      description: '/assets/guests/gregaIvancic_opis.png'
+      image: "/assets/guests/matejSkoliber2.png",
+      link: "https://www.youtube.com/watch?v=ub_pnkapdxo",
+      description: "/assets/guests/matejSkoliber_opis.png",
     },
     {
-      image: '/assets/guests/ivanRihtaric2.png',
-      link: 'https://www.youtube.com/watch?v=ptYK6YBr1hc',
-      description: '/assets/guests/ivanRihtaric_opis.png'
+      image: "/assets/guests/damijanJanzekovic2.png",
+      link: "https://www.youtube.com/watch?v=AkM8cE0vj7c",
+      description: "/assets/guests/damijanJanzekovic_opis.png",
     },
     {
-      image: '/assets/guests/alesMaver2.png',
-      link: 'https://www.youtube.com/watch?v=4W448Sls-yg',
-      description: '/assets/guests/alesMaver_opis.png'
+      image: "/assets/guests/gregaIvancic.png",
+      link: "https://www.youtube.com/watch?v=XJ8QTTpcj5E",
+      description: "/assets/guests/gregaIvancic_opis.png",
     },
     {
-      image: '/assets/guests/andrejStremfelj2.png',
-      link: 'https://www.youtube.com/watch?v=Mm1Nveb-c44',
-      description: '/assets/guests/andrejStremfelj_opis.png'
+      image: "/assets/guests/anzeZavrl.png",
+      link: "https://www.youtube.com/watch?v=gbjWNM5jveI",
+      description: "/assets/guests/anzeZavrl_opis.png",
     },
     {
-      image: '/assets/guests/goranSrok2.png',
-      link: 'https://www.youtube.com/watch?v=jZTkqyXzgpI',
-      description: '/assets/guests/goranSrok_opis.png'
+      image: "/assets/guests/ivanRihtaric2.png",
+      link: "https://www.youtube.com/watch?v=ptYK6YBr1hc",
+      description: "/assets/guests/ivanRihtaric_opis.png",
     },
     {
-      image: '/assets/guests/igorPlohl2.png',
-      link: 'https://www.youtube.com/watch?v=g8pRKA66VS0',
-      description: '/assets/guests/igorPlohl_opis.png'
+      image: "/assets/guests/alesMaver2.png",
+      link: "https://www.youtube.com/watch?v=4W448Sls-yg",
+      description: "/assets/guests/alesMaver_opis.png",
     },
     {
-      image: '/assets/guests/martinBele.png',
-      link: 'https://www.youtube.com/watch?v=g8pRKA66VS0',
-      description: '/assets/guests/martinBele_opis.png'
+      image: "/assets/guests/andrejStremfelj2.png",
+      link: "https://www.youtube.com/watch?v=Mm1Nveb-c44",
+      description: "/assets/guests/andrejStremfelj_opis.png",
+    },
+    {
+      image: "/assets/guests/jakaTomc.png",
+      link: "https://www.youtube.com/watch?v=zC9AsyN2o3Y",
+      description: "/assets/guests/jakaTomc_opis.png",
+    },
+    {
+      image: "/assets/guests/goranSrok2.png",
+      link: "https://www.youtube.com/watch?v=jZTkqyXzgpI",
+      description: "/assets/guests/goranSrok_opis.png",
+    },
+    {
+      image: "/assets/guests/urosDokl.png",
+      link: "https://www.youtube.com/watch?v=qQR6SndqFwQ",
+      description: "/assets/guests/urosDokl_opis.png",
+    },
+    {
+      image: "/assets/guests/igorPlohl2.png",
+      link: "https://www.youtube.com/watch?v=g8pRKA66VS0",
+      description: "/assets/guests/igorPlohl_opis.png",
+    },
+    {
+      image: "/assets/guests/martinBele.png",
+      link: "https://www.youtube.com/watch?v=g8pRKA66VS0",
+      description: "/assets/guests/martinBele_opis.png",
     },
   ];
-
 
   return (
     <section className="featured-guests section">
@@ -84,7 +108,7 @@ const FeaturedGuests = () => {
         PRETEKLI GOSTJE:
       </motion.h2>
 
-      <div style={{ height: '600px', position: 'relative' }}>
+      <div style={{ height: "600px", position: "relative" }}>
         <CircularGallery
           scrollSpeed={isMobile ? 2.5 : 1.5}
           bend={0.4}
