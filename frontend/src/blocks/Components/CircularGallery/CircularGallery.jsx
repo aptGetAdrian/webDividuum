@@ -260,7 +260,9 @@ class App {
       scrollSpeed = 2,
       scrollEase = 0.05,
       onItemClick,
-      mobileIdleTime = 1000, // 4 seconds default
+      mobileIdleTime = 1000,
+      autoScrollSpeed = 0.008,
+      autoScrollResumeDelay = 2000,
     } = {},
   ) {
     document.documentElement.classList.remove("no-js");
@@ -271,27 +273,41 @@ class App {
     this.onCheckDebounce = debounce(this.onCheck, 200);
     this.mobileIdleTime = mobileIdleTime;
     this.isMobile = isMobileDevice();
-    
+
     // Mobile auto-transition variables
     this.lastActivityTime = Date.now();
     this.isShowingDescriptions = false;
     this.idleTimeout = null;
-    
+
     // Add drag tracking variables
     this.isDragging = false;
     this.dragStartX = 0;
     this.dragStartY = 0;
-    this.dragThreshold = 5; // pixels - minimum movement to consider it a drag
-    
+    this.dragThreshold = 5;
+
+    // Auto-scroll state
+    this.autoScrollSpeed = autoScrollSpeed;
+    this.autoScrollResumeDelay = autoScrollResumeDelay;
+    this.isAutoScrolling = true;
+    this.isInteracting = false;
+    this.isHoveringCanvas = false;
+    this.autoScrollResumeTimeout = null;
+
     this.createRenderer();
     this.createCamera();
     this.createScene();
     this.onResize();
     this.createGeometry();
     this.createMedias(items, bend, borderRadius);
+    if (this.medias && this.medias.length > 0) {
+      const halfTotal = this.medias[0].widthTotal / 2;
+      this.scroll.current = halfTotal;
+      this.scroll.target = halfTotal;
+      this.scroll.last = halfTotal;
+    }
     this.update();
     this.addEventListeners();
-    
+
     // Start mobile idle detection if on mobile
     if (this.isMobile) {
       this.startMobileIdleDetection();
@@ -339,7 +355,24 @@ class App {
       this.resetIdleTimer();
     }
   }
-  
+
+  pauseAutoScroll() {
+    this.isAutoScrolling = false;
+    if (this.autoScrollResumeTimeout) {
+      clearTimeout(this.autoScrollResumeTimeout);
+      this.autoScrollResumeTimeout = null;
+    }
+  }
+
+  scheduleAutoScrollResume() {
+    if (this.isInteracting || this.isHoveringCanvas) return;
+    if (this.autoScrollResumeTimeout) clearTimeout(this.autoScrollResumeTimeout);
+    this.autoScrollResumeTimeout = setTimeout(() => {
+      this.isAutoScrolling = true;
+      this.autoScrollResumeTimeout = null;
+    }, this.autoScrollResumeDelay);
+  }
+
   createRenderer() {
     this.renderer = new Renderer({ alpha: true, antialias: true });
     this.gl = this.renderer.gl;
@@ -443,17 +476,18 @@ class App {
   
   onTouchDown(e) {
     this.isDown = true;
-    this.isDragging = false; // Reset dragging state
+    this.isDragging = false;
+    this.isInteracting = true;
     this.scroll.position = this.scroll.current;
-    
+
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
+
     this.start = clientX;
     this.dragStartX = clientX;
     this.dragStartY = clientY;
-    
-    // Register activity for mobile idle detection
+
+    this.pauseAutoScroll();
     this.registerActivity();
   }
   
@@ -480,12 +514,14 @@ class App {
   
   onTouchUp() {
     this.isDown = false;
+    this.isInteracting = false;
     this.onCheck();
-    
-    // Reset dragging state after a short delay to prevent click events
+
     setTimeout(() => {
       this.isDragging = false;
     }, 50);
+
+    this.scheduleAutoScrollResume();
   }
   
   onWheel(e) {
@@ -527,6 +563,10 @@ class App {
   }
   
   update() {
+    if (this.isAutoScrolling) {
+      this.scroll.target += this.autoScrollSpeed;
+    }
+
     this.scroll.current = lerp(
       this.scroll.current,
       this.scroll.target,
@@ -551,8 +591,8 @@ class App {
     this.boundOnMouseClick = this.onMouseClick.bind(this);
     
     window.addEventListener("resize", this.boundOnResize);
-    window.addEventListener("mousewheel", this.boundOnWheel);
-    window.addEventListener("wheel", this.boundOnWheel);
+    this.gl.canvas.addEventListener("mousewheel", this.boundOnWheel);
+    this.gl.canvas.addEventListener("wheel", this.boundOnWheel);
     window.addEventListener("mousedown", this.boundOnTouchDown);
     window.addEventListener("mousemove", this.boundOnTouchMove);
     window.addEventListener("mouseup", this.boundOnTouchUp);
@@ -560,29 +600,31 @@ class App {
     window.addEventListener("touchmove", this.boundOnTouchMove);
     window.addEventListener("touchend", this.boundOnTouchUp);
     
+    this.boundOnCanvasEnter = () => { this.isHoveringCanvas = true; };
+    this.boundOnCanvasLeave = () => { this.isHoveringCanvas = false; };
+    this.gl.canvas.addEventListener("mouseenter", this.boundOnCanvasEnter);
+    this.gl.canvas.addEventListener("mouseleave", this.boundOnCanvasLeave);
+
     // Add mouse move and click for hover detection and clicking (desktop only)
     if (!this.isMobile) {
       this.gl.canvas.addEventListener("mousemove", this.boundOnMouseMove);
       this.gl.canvas.addEventListener("mouseleave", () => {
-        // Clear all hovers when mouse leaves canvas
         this.medias.forEach(media => media.setHovered(false));
         this.gl.canvas.style.cursor = 'default';
       });
     }
-    
+
     this.gl.canvas.addEventListener("click", this.boundOnMouseClick);
   }
   
   destroy() {
-    // Clean up mobile idle detection
-    if (this.idleTimeout) {
-      clearTimeout(this.idleTimeout);
-    }
+    if (this.idleTimeout) clearTimeout(this.idleTimeout);
+    if (this.autoScrollResumeTimeout) clearTimeout(this.autoScrollResumeTimeout);
     
     window.cancelAnimationFrame(this.raf);
     window.removeEventListener("resize", this.boundOnResize);
-    window.removeEventListener("mousewheel", this.boundOnWheel);
-    window.removeEventListener("wheel", this.boundOnWheel);
+    this.gl.canvas.removeEventListener("mousewheel", this.boundOnWheel);
+    this.gl.canvas.removeEventListener("wheel", this.boundOnWheel);
     window.removeEventListener("mousedown", this.boundOnTouchDown);
     window.removeEventListener("mousemove", this.boundOnTouchMove);
     window.removeEventListener("mouseup", this.boundOnTouchUp);
@@ -593,6 +635,8 @@ class App {
     if (this.gl && this.gl.canvas) {
       this.gl.canvas.removeEventListener("mousemove", this.boundOnMouseMove);
       this.gl.canvas.removeEventListener("click", this.boundOnMouseClick);
+      this.gl.canvas.removeEventListener("mouseenter", this.boundOnCanvasEnter);
+      this.gl.canvas.removeEventListener("mouseleave", this.boundOnCanvasLeave);
     }
     
     if (
@@ -611,14 +655,16 @@ export default function CircularGallery({
   borderRadius = 0.05,
   scrollSpeed = 2,
   scrollEase = 0.05,
-  mobileIdleTime = 1000, // New prop for mobile idle time in milliseconds
+  mobileIdleTime = 1000,
+  autoScrollSpeed = 0.008,
+  autoScrollResumeDelay = 2000,
 }) {
   const containerRef = useRef(null);
-  
+
   const handleItemClick = (link) => {
     window.open(link, '_blank');
   };
-  
+
   useEffect(() => {
     const app = new App(containerRef.current, {
       items,
@@ -627,12 +673,14 @@ export default function CircularGallery({
       scrollSpeed,
       scrollEase,
       mobileIdleTime,
+      autoScrollSpeed,
+      autoScrollResumeDelay,
       onItemClick: handleItemClick,
     });
     return () => {
       app.destroy();
     };
-  }, [items, bend, borderRadius, scrollSpeed, scrollEase, mobileIdleTime]);
+  }, [items, bend, borderRadius, scrollSpeed, scrollEase, mobileIdleTime, autoScrollSpeed, autoScrollResumeDelay]);
   
   return <div className="circular-gallery" ref={containerRef} />;
 }
