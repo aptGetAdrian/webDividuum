@@ -1,4 +1,5 @@
 import Hero from './Hero';
+import LatestEpisode from './LatestEpisode';
 import Support from './Support';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import FeaturedGuests from './FeaturedGuests';
@@ -25,6 +26,7 @@ const Home = () => {
       </Helmet>
       <main>
         <Hero />
+        <LatestEpisode />
         <FeaturedGuests />
         <Support id="support" />
       </main>

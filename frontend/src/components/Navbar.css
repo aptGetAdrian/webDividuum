@@ -10,9 +10,8 @@ html {
   top: 0;
   z-index: 1000;
   padding: 1.5rem 0; /* Increased padding */
-  transition: all 0.8s ease; /* Smooth transition */
   box-shadow: none; /* No shadow initially */
-  height: 5.5rem; /* Add explicit height */
+  height: var(--navbar-height);
   transform: translateY(0);
   transition: transform 0.3s ease, background-color 0.8s ease, padding 0.8s ease;
 }
@@ -34,7 +33,7 @@ html {
   background-color: rgba(10, 31, 38, 0.95); /* Original opacity when scrolled */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Drop shadow when scrolled */
   padding: 1.2rem 0; /* Slightly reduced when scrolled for a nice effect */
-  height: 4.5rem; /* Add explicit height for scrolled state */
+  height: var(--navbar-height-scrolled);
 }
 
 .nav-container {
@@ -62,7 +61,6 @@ html {
   text-decoration: none;
   font-size: 1.1rem; /* Increased font size */
   font-weight: 600; /* Made text bolder */
-  letter-spacing: 0.5px; /* Added letter spacing */
   text-transform: uppercase; /* Made text uppercase */
   transition: all 0.3s ease;
   position: relative;

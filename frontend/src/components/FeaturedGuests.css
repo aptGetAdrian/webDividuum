@@ -1,118 +1,348 @@
-.featured-guests {
-  background-color: #eeffff;
-  padding: 4rem 0;
-}
+/* =============================================================================
+   PRETEKLI GOSTJE — a registry of individuals.
 
-.section-title {
-  text-align: center;
-  font-size: 3rem;
-  color: #12353e;
-  font-weight: 700;
+   A ring of square photo tiles around a hollow centre that holds the section
+   title. The 1px grid seams are the container's background showing through the
+   gap, so every rule is exactly one pixel and never doubles at a seam.
+
+   Ring geometry — see RING_SLOTS in FeaturedGuests.jsx:
+     desktop  6 cols × 4 rows → 16 perimeter cells, centre spans cols 2–5, rows 2–3
+     tablet   4 cols × 6 rows → 16 perimeter cells, centre spans cols 2–3, rows 2–5
+     mobile   plain 2-col grid, title first, tap to reveal
+   ========================================================================== */
+
+.guests {
   position: relative;
-  padding-bottom: 1rem;
-  font-family: 'Anton', sans-serif;
-  letter-spacing: 0.35rem;
+  background-color: var(--ink);
 }
 
-.section-title::after {
-  content: '';
+/* Very subtle analog grain. Purely optical — never intercepts pointer events. */
+.guests::after {
+  content: "";
   position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 4px;
-  background: linear-gradient(90deg, #12353e, #2a5965);
-  border-radius: 2px;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.guests-grid {
+.guests__ring {
+  --ring-cols: 6;
+  --ring-rows: 4;
+  --bio-lines: 6;
+
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  grid-template-columns: repeat(var(--ring-cols), 1fr);
+  /* The grid's own ratio makes every row exactly one column wide, so the tiles
+     are square without relying on aspect-ratio per item — grid stretch would
+     override that anyway. */
+  aspect-ratio: var(--ring-cols) / var(--ring-rows);
+  grid-auto-rows: 1fr;
+  gap: 1px;
+  background-color: var(--rule); /* shows through the gap as hairline seams */
+  border-block: 1px solid var(--rule);
 }
 
-.guest-card {
-  background: #f8f9fa;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.437);
+.guests__slot {
   position: relative;
-}
-
-.guest-card:hover {
-  transform: translateY(-3px) 0.4s ease;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.437);
-}
-
-.guest-image {
-  position: relative;
-  padding-bottom: 100%;
+  min-width: 0;
+  min-height: 0;
+  background-color: var(--ink-deep);
   overflow: hidden;
 }
 
-.guest-image::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  background: linear-gradient(to top, rgba(18, 53, 62, 0.581), transparent);
-  z-index: 1;
+/* --- the photo tile ------------------------------------------------------ */
+
+.guests__tile {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 
-.guest-image img {
-  position: absolute;
-  top: 0;
-  left: 0;
+.guests__photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  display: block;
+  /* The source images are already black and white; this holds the ones that
+     aren't quite neutral in line with the rest. */
+  filter: grayscale(1) contrast(1.05);
 }
 
-.guest-card:hover .guest-image img {
-  transform: scale(1.08);
-}
-
-.guest-card h3 {
+/* Persistent label: what this person is. Scanning the ring reads as the range
+   of the show, which is the whole point of the section. */
+.guests__role {
   position: absolute;
-  bottom: 0;
   left: 0;
+  bottom: 0;
+  /* Above the panel: the label is the fixed anchor the reveal builds on top of. */
+  z-index: 3;
   width: 100%;
-  padding: 2rem 1.2rem 1.2rem;
-  text-align: center;
-  font-size: 1.15rem;
-  color: white;
-  margin: 0;
-  font-weight: 600;
-  letter-spacing: 0.7px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 2;
+  padding: var(--space-4) var(--space-2) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--bone);
+  background-image: linear-gradient(to top, rgba(7, 22, 25, 0.92), transparent);
 }
 
+/* --- the reveal ---------------------------------------------------------- */
 
-@media (max-width: 1024px) {
-  .guests-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    padding: 0 2rem;
+/* Not a card — an overprint. The photo stays underneath and the scrim only
+   darkens enough to carry type, so the tile still reads as a picture. The
+   bottom padding clears the role label, which stays put on hover. */
+/* Covers the whole tile at a flat 90% — no gradient, so density is even and the
+   photo reads through everywhere. 0.9 is a floor, not a preference: over a
+   near-white photo (Polona Kovač's top) anything lighter drops the body text
+   under a 4.5:1 contrast ratio. Type stays bottom-anchored so the role label
+   below it never moves. */
+.guests__panel {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-2);
+  padding-bottom: calc(var(--space-2) + 1.5rem);
+  background-color: rgba(7, 22, 25, 0.9);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--dur-snap) var(--ease-snap),
+    visibility var(--dur-snap) var(--ease-snap);
+}
+
+.guests__tile:hover .guests__panel,
+.guests__tile:focus-visible .guests__panel,
+.guests__tile.is-revealed .guests__panel,
+.guests__tile:hover .guests__cta,
+.guests__tile:focus-visible .guests__cta,
+.guests__tile.is-revealed .guests__cta {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* In a column flex container every item shrinks by default, which silently
+   crushed the name to zero height on short tiles. Only the bio may flex. */
+.guests__name {
+  flex: 0 0 auto;
+  font-family: var(--font-display);
+  font-size: clamp(0.9375rem, 1.15vw, 1.25rem);
+  /* Same caron clearance as .latest__title — "DAMIJAN JANŽEKOVIČ" wraps to two
+     lines on narrow tiles and collided at 1.1. */
+  line-height: 1.24;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+/* Inter, matching the rest of the site's prose. Mono is the label face here —
+   role, count, CTA — and using it for running text fought the system. */
+.guests__bio {
+  /* The panel is back to a fixed height, so column flex items can shrink again.
+     Only the bio is allowed to — the name must never be squashed to nothing. */
+  flex: 0 1 auto;
+  min-height: 0;
+  margin-top: var(--space-1);
+  font-family: var(--font-body);
+  font-size: clamp(0.6875rem, 0.78vw, 0.8125rem);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  /* Descriptions vary in length; clamp rather than let one overflow its tile. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--bio-lines);
+  line-clamp: var(--bio-lines);
+  overflow: hidden;
+}
+
+/* Sits on the role label's line, at the other end of the tile. */
+.guests__cta {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  z-index: 3;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--signal);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--dur-snap) var(--ease-snap),
+    visibility var(--dur-snap) var(--ease-snap);
+}
+
+.guests__tile:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: -2px;
+}
+
+/* --- the spare slot: the mark from the logo ------------------------------ */
+
+.guests__mark {
+  display: grid;
+  place-items: center;
+  background-color: var(--ink);
+  color: var(--rule);
+}
+
+.guests__mark svg {
+  width: clamp(28px, 3.2vw, 44px);
+  height: auto;
+}
+
+/* --- the hollow centre --------------------------------------------------- */
+
+.guests__index {
+  grid-area: 2 / 2 / 4 / 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: var(--ink);
+  text-align: center;
+}
+
+.guests__title {
+  margin: 0;
+  font-family: var(--font-display);
+  /* Now that the ring is full-bleed the hollow centre scales with the viewport,
+     so the cap has room to rise before the title stops filling it. */
+  font-size: clamp(1.5rem, 4.6vw, 5.75rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  color: var(--bone);
+  /* Anton's tracking pushes the last letter off-centre; pull it back. */
+  text-indent: var(--track-display);
+}
+
+.guests__count {
+  position: relative;
+  margin: 0;
+  padding-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--concrete);
+}
+
+.guests__count::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 40px;
+  height: 1px;
+  background-color: var(--rule);
+  transform: translateX(-50%);
+}
+
+/* --- ring placement, clockwise from the top-left ------------------------- */
+
+.guests__ring > :nth-child(1)  { grid-area: 1 / 1; }
+.guests__ring > :nth-child(2)  { grid-area: 1 / 2; }
+.guests__ring > :nth-child(3)  { grid-area: 1 / 3; }
+.guests__ring > :nth-child(4)  { grid-area: 1 / 4; }
+.guests__ring > :nth-child(5)  { grid-area: 1 / 5; }
+.guests__ring > :nth-child(6)  { grid-area: 1 / 6; }
+.guests__ring > :nth-child(7)  { grid-area: 2 / 6; }
+.guests__ring > :nth-child(8)  { grid-area: 3 / 6; }
+.guests__ring > :nth-child(9)  { grid-area: 4 / 6; }
+.guests__ring > :nth-child(10) { grid-area: 4 / 5; }
+.guests__ring > :nth-child(11) { grid-area: 4 / 4; }
+.guests__ring > :nth-child(12) { grid-area: 4 / 3; }
+.guests__ring > :nth-child(13) { grid-area: 4 / 2; }
+.guests__ring > :nth-child(14) { grid-area: 4 / 1; }
+.guests__ring > :nth-child(15) { grid-area: 3 / 1; }
+.guests__ring > :nth-child(16) { grid-area: 2 / 1; }
+
+/* --- tablet: the ring turns portrait, 4 × 6 ------------------------------
+   Kicks in early: below this the 6-column tiles get too small for a reveal
+   panel to hold a name and a description at a readable size. */
+
+@media (max-width: 1280px) {
+  .guests__ring {
+    --ring-cols: 4;
+    --ring-rows: 6;
+    /* This range spans 192px–320px tiles; the clamp has to suit the smallest,
+       or the slug grows past the tile top and the name gets clipped away. */
+    --bio-lines: 5;
+  }
+
+  .guests__ring > :nth-child(1)  { grid-area: 1 / 1; }
+  .guests__ring > :nth-child(2)  { grid-area: 1 / 2; }
+  .guests__ring > :nth-child(3)  { grid-area: 1 / 3; }
+  .guests__ring > :nth-child(4)  { grid-area: 1 / 4; }
+  .guests__ring > :nth-child(5)  { grid-area: 2 / 4; }
+  .guests__ring > :nth-child(6)  { grid-area: 3 / 4; }
+  .guests__ring > :nth-child(7)  { grid-area: 4 / 4; }
+  .guests__ring > :nth-child(8)  { grid-area: 5 / 4; }
+  .guests__ring > :nth-child(9)  { grid-area: 6 / 4; }
+  .guests__ring > :nth-child(10) { grid-area: 6 / 3; }
+  .guests__ring > :nth-child(11) { grid-area: 6 / 2; }
+  .guests__ring > :nth-child(12) { grid-area: 6 / 1; }
+  .guests__ring > :nth-child(13) { grid-area: 5 / 1; }
+  .guests__ring > :nth-child(14) { grid-area: 4 / 1; }
+  .guests__ring > :nth-child(15) { grid-area: 3 / 1; }
+  .guests__ring > :nth-child(16) { grid-area: 2 / 1; }
+
+  .guests__index {
+    grid-area: 2 / 2 / 6 / 4;
   }
 }
+
+/* --- mobile: the ring dissolves into a plain contact sheet ---------------- */
 
 @media (max-width: 768px) {
-  .section-title {
-    font-size: 2rem;
+  .guests__ring {
+    --bio-lines: 5;
+    grid-template-columns: repeat(2, 1fr);
+    aspect-ratio: auto;
+    grid-auto-rows: auto;
   }
 
-  .guests-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 0 1.5rem;
+  /* Drop every ring placement and let the tiles flow. This has to be written as
+     :nth-child(n) rather than `> *` so it matches the specificity of the ring
+     placement rules above — `> *` (0,1,0) would lose to `> :nth-child(1)` (0,2,0)
+     and the desktop ring would leak into the mobile layout. */
+  .guests__ring > :nth-child(n) {
+    grid-area: auto;
   }
-} 
 
+  .guests__slot {
+    aspect-ratio: 1;
+  }
+
+  /* The centre block is last in the DOM (so the ring's tab order runs clockwise),
+     but on mobile it has to read as the section header.
+     Selector must stay at (0,2,0) and sit after the reset above, or the reset's
+     `grid-area: auto` wins on grid-column and the header stops spanning. */
+  .guests__ring > .guests__index {
+    grid-column: 1 / -1;
+    order: -1;
+    aspect-ratio: auto;
+    padding: var(--space-4) var(--space-3);
+  }
+
+  /* No .guests__panel padding override here: the shorthand would reset
+     padding-bottom and let the bio run under the role label and the CTA. */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guests__panel,
+  .guests__cta {
+    transition-duration: 1ms;
+  }
+}

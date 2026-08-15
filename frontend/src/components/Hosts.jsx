@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import { ACCENT_COLOR } from "../theme";
 import "./Hosts.css";
 import ProfileCard from "/src/blocks/Components/ProfileCard/ProfileCard";
 import { Helmet } from "react-helmet-async";
@@ -26,7 +27,7 @@ const Hosts = () => {
     fullScreen: { enable: false, zIndex: 1 },
     fpsLimit: 60,
     particles: {
-      color: { value: "#2e9cddff" },
+      color: { value: ACCENT_COLOR },
       links: { enable: false },
       move: {
         direction: "none",
@@ -91,7 +92,6 @@ const Hosts = () => {
               ljudmi, ki mislijo drugače, živijo drugače ali so preprosto
               doživeli nekaj, česar sama še nista.
             </p>
-            <br />
             <p className="podcast-text">
               To ni podkast z navodili za življenje. To je podkast, kjer
               sogovorniki s svojimi zgodbami razrahljajo gotovosti, odprejo nova
@@ -99,7 +99,6 @@ const Hosts = () => {
               poslušanju našli odgovore, drugič le še več dvomov – a prav v tem
               je čar.
             </p>
-            <br />
             <p className="podcast-text">
               Individuum ni oddaja o tem, kako biti enak. Je povabilo, da
               prisluhnete različnosti in morda v njej prepoznate del sebe.
@@ -131,7 +130,6 @@ const Hosts = () => {
             <div className="host-content">
               <h2>Lan Kokol</h2>
               <h3>Soustanovitelj in voditelj</h3>
-              <br />
               <p>
                 Vztrajen in odločen. Privlačijo ga konkretne stvari, preverjena
                 dejstva in izzivi, ki premikajo meje. Če ga ni za mikrofonom, ga
@@ -166,7 +164,6 @@ const Hosts = () => {
             <div className="host-content">
               <h2>Patrik Majhen</h2>
               <h3>Soustanovitelj in voditelj</h3>
-              <br />
               <p>
                 Na prvi vtis miren in premišljen, a ob pravih trenutkih hitro
                 razkrije svojo energičnost in zagnanost. Ceni ravnovesje med
@@ -202,7 +199,6 @@ const Hosts = () => {
             <div className="host-content">
               <h2>Vid Buzeti</h2>
               <h3>Voditelj</h3>
-              <br />
               <p>
                 Študent medicine, ki ga ne zanimajo samo diagnoze, ampak tudi
                 širša slika sveta. Rad postavlja specifična, zahtevna vprašanja
@@ -236,7 +232,6 @@ const Hosts = () => {
             <div className="host-content">
               <h2>Aljaž Balažic</h2>
               <h3>Urednik videov</h3>
-              <br />
               <p>
                 Član ekipe, ki skrbi, da pogovori ne ostanejo le v zvoku – ampak
                 zaživijo tudi na zaslonih. Glavni kreator in urednik videov.

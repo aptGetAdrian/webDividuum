@@ -1,123 +1,103 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./FeaturedGuests.css";
-import CircularGallery from "/src/blocks/Components/CircularGallery/CircularGallery.jsx";
+import { guests } from "../data/guests";
+import FingerprintMark from "./FingerprintMark";
+
+/**
+ * Perimeter of the ring. The grid is 6×4 on desktop and 4×6 on tablet — both
+ * have a 16-cell perimeter around an 8-cell hollow centre, so one slot map
+ * serves both. A ring perimeter is always even, and there are 15 guests, so the
+ * spare slot renders the fingerprint mark from the logo.
+ *
+ * Adding a 16th guest just fills that slot. Going past 16 needs the ring to grow
+ * (6×5 → 18, 6×6 → 20) — bump RING_SLOTS and extend the :nth-child placement
+ * rules in FeaturedGuests.css to match.
+ */
+const RING_SLOTS = 16;
+
+/** Renders markdown *emphasis* — used for publication titles in the descriptions. */
+const withEmphasis = (text) =>
+  text.split("*").map((part, i) => (i % 2 ? <em key={i}>{part}</em> : part));
 
 const FeaturedGuests = () => {
-  const [isMobile, setIsMobile] = useState(false);
+  // On touch devices there is no hover, so the first tap reveals and the second
+  // opens the episode. On pointer devices CSS :hover does the work and this stays null.
+  const [revealed, setRevealed] = useState(null);
+  const [tapToReveal, setTapToReveal] = useState(false);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkIfMobile();
-
-    window.addEventListener("resize", checkIfMobile);
-
-    return () => window.removeEventListener("resize", checkIfMobile);
+    const query = window.matchMedia("(hover: none)");
+    const sync = () => setTapToReveal(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
   }, []);
 
-  const guests = [
-    {
-      image: "/assets/guests/dejanZavec.png",
-      link: "https://www.youtube.com/watch?v=2O3BO2vq6Xk",
-      description: "/assets/guests/dejanZavec_opis.png",
-    },
-    {
-      image: "/assets/guests/viktorMarkelj2.png",
-      link: "https://www.youtube.com/watch?v=NpdTZQ3u2_Q",
-      description: "/assets/guests/viktorMarkelj_opis.png",
-    },
-    {
-      image: "/assets/guests/polonaKovac.png",
-      link: "https://www.youtube.com/watch?v=hyObyUGyQAM",
-      description: "/assets/guests/polonaKovac_opis.png",
-    },
-    {
-      image: "/assets/guests/matejSkoliber2.png",
-      link: "https://www.youtube.com/watch?v=ub_pnkapdxo",
-      description: "/assets/guests/matejSkoliber_opis.png",
-    },
-    {
-      image: "/assets/guests/damijanJanzekovic2.png",
-      link: "https://www.youtube.com/watch?v=AkM8cE0vj7c",
-      description: "/assets/guests/damijanJanzekovic_opis.png",
-    },
-    {
-      image: "/assets/guests/gregaIvancic.png",
-      link: "https://www.youtube.com/watch?v=XJ8QTTpcj5E",
-      description: "/assets/guests/gregaIvancic_opis.png",
-    },
-    {
-      image: "/assets/guests/anzeZavrl.png",
-      link: "https://www.youtube.com/watch?v=gbjWNM5jveI",
-      description: "/assets/guests/anzeZavrl_opis.png",
-    },
-    {
-      image: "/assets/guests/ivanRihtaric2.png",
-      link: "https://www.youtube.com/watch?v=ptYK6YBr1hc",
-      description: "/assets/guests/ivanRihtaric_opis.png",
-    },
-    {
-      image: "/assets/guests/alesMaver2.png",
-      link: "https://www.youtube.com/watch?v=4W448Sls-yg",
-      description: "/assets/guests/alesMaver_opis.png",
-    },
-    {
-      image: "/assets/guests/andrejStremfelj2.png",
-      link: "https://www.youtube.com/watch?v=Mm1Nveb-c44",
-      description: "/assets/guests/andrejStremfelj_opis.png",
-    },
-    {
-      image: "/assets/guests/jakaTomc.png",
-      link: "https://www.youtube.com/watch?v=zC9AsyN2o3Y",
-      description: "/assets/guests/jakaTomc_opis.png",
-    },
-    {
-      image: "/assets/guests/goranSrok2.png",
-      link: "https://www.youtube.com/watch?v=jZTkqyXzgpI",
-      description: "/assets/guests/goranSrok_opis.png",
-    },
-    {
-      image: "/assets/guests/urosDokl.png",
-      link: "https://www.youtube.com/watch?v=qQR6SndqFwQ",
-      description: "/assets/guests/urosDokl_opis.png",
-    },
-    {
-      image: "/assets/guests/igorPlohl2.png",
-      link: "https://www.youtube.com/watch?v=g8pRKA66VS0",
-      description: "/assets/guests/igorPlohl_opis.png",
-    },
-    {
-      image: "/assets/guests/martinBele.png",
-      link: "https://www.youtube.com/watch?v=g8pRKA66VS0",
-      description: "/assets/guests/martinBele_opis.png",
-    },
-  ];
+  useEffect(() => {
+    if (revealed === null) return undefined;
+    const closeOnOutside = (event) => {
+      if (!sectionRef.current?.contains(event.target)) setRevealed(null);
+    };
+    document.addEventListener("pointerdown", closeOnOutside);
+    return () => document.removeEventListener("pointerdown", closeOnOutside);
+  }, [revealed]);
+
+  const handleTileClick = (index) => (event) => {
+    if (!tapToReveal || revealed === index) return; // let the link through
+    event.preventDefault();
+    setRevealed(index);
+  };
+
+  const slots = Array.from({ length: RING_SLOTS }, (_, i) => guests[i] ?? null);
 
   return (
-    <section className="featured-guests section">
-      <motion.h2
-        className="section-title"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        PRETEKLI GOSTJE:
-      </motion.h2>
+    <section className="guests" aria-labelledby="guests-title" ref={sectionRef}>
+      <div className="guests__ring">
+        {slots.map((guest, index) =>
+          guest ? (
+            <a
+              key={guest.name}
+              className={`guests__slot guests__tile${revealed === index ? " is-revealed" : ""}`}
+              href={guest.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleTileClick(index)}
+            >
+              <img
+                className="guests__photo"
+                src={guest.image}
+                alt={guest.name}
+                width="500"
+                height="500"
+                loading="lazy"
+                decoding="async"
+              />
+              {/* The panel sits under the role label, which never moves — on hover
+                  the name and bio rise above it rather than replacing it. */}
+              <span className="guests__panel">
+                <span className="guests__name">{guest.name}</span>
+                <span className="guests__bio">{withEmphasis(guest.description)}</span>
+              </span>
 
-      <div style={{ height: "600px", position: "relative" }}>
-        <CircularGallery
-          scrollSpeed={isMobile ? 2.5 : 1.5}
-          bend={0.4}
-          textColor="#12353e"
-          borderRadius={0.05}
-          scrollEase={isMobile ? 0.05 : 0.025}
-          items={guests}
-          font="bold 24px 'Comic Sans MS', cursive, sans-serif"
-        />
+              <span className="guests__role">{guest.role}</span>
+              <span className="guests__cta">Oglej si ↗</span>
+            </a>
+          ) : (
+            <div className="guests__slot guests__mark" key={`mark-${index}`} aria-hidden="true">
+              <FingerprintMark />
+            </div>
+          ),
+        )}
+
+        <div className="guests__index">
+          <h2 className="guests__title" id="guests-title">
+            Pretekli gostje
+          </h2>
+          <p className="guests__count">
+            {guests.length} posameznikov
+          </p>
+        </div>
       </div>
     </section>
   );

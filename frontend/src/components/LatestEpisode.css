@@ -1,0 +1,277 @@
+/* =============================================================================
+   NAJNOVEJŠA EPIZODA — the most recent entry in the archive.
+
+   Same language as the guests ring: hard edges, hairline rules, mono for data,
+   Anton for the title, colour rationed to the play mark and one link.
+   ========================================================================== */
+
+.latest {
+  --play-size: clamp(48px, 4.5vw, 72px);
+
+  position: relative;
+  background-color: var(--ink);
+  /* No bottom rule: the guests ring below already draws its own top rule, and
+     two adjacent hairlines read as one thick 2px line. */
+}
+
+.latest::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.latest__inner {
+  position: relative;
+  z-index: 1;
+  padding: var(--space-6) var(--space-4);
+}
+
+/* Section label, sitting on a rule that runs the full width. */
+.latest__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.latest__eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--rule);
+}
+
+.latest__body {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+/* --- left: title, data, action ------------------------------------------- */
+
+.latest__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.latest__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.6vw, 2.75rem);
+  font-weight: 400;
+  /* Anton is tight-set and Slovenian carons (Ž Š Č) sit high — at anything under
+     ~1.2 they collide with the descenders of the line above. */
+  line-height: 1.24;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bone);
+  /* YouTube titles run long and vary wildly; hold them to a predictable block. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+/* The data strip: what the API already returns and the old section discarded. */
+.latest__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: var(--space-4) 0 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+}
+
+.latest__meta-item dt {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--concrete);
+}
+
+.latest__meta-item dd {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.latest__action {
+  margin-top: var(--space-5);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--rule);
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--bone);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-snap) var(--ease-snap),
+    border-color var(--dur-snap) var(--ease-snap),
+    color var(--dur-snap) var(--ease-snap);
+}
+
+.latest__action:hover {
+  background-color: var(--signal);
+  border-color: var(--signal);
+  color: var(--ink);
+}
+
+.latest__action:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+/* --- right: the episode itself ------------------------------------------- */
+
+.latest__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background-color: var(--ink-deep);
+  border: 1px solid var(--rule);
+}
+
+.latest__frame,
+.latest__play {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.latest__play {
+  display: block;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.latest__play[disabled] {
+  cursor: default;
+}
+
+.latest__thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.05);
+  transition: filter var(--dur-snap) var(--ease-snap);
+}
+
+.latest__thumb--empty {
+  background-color: var(--ink-deep);
+}
+
+/* Colour returns to the thumbnail on hover — the one place on the page where
+   an image is allowed to be in colour, so it reads as "this one is live". */
+.latest__play:not([disabled]):hover .latest__thumb,
+.latest__play:focus-visible .latest__thumb {
+  filter: grayscale(0) contrast(1);
+}
+
+/* A square blade, not a round button. */
+.latest__play-mark {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: var(--play-size);
+  aspect-ratio: 1;
+  background-color: var(--signal);
+  color: var(--ink);
+  transition:
+    background-color var(--dur-snap) var(--ease-snap),
+    color var(--dur-snap) var(--ease-snap);
+}
+
+.latest__play-mark svg {
+  width: 42%;
+  height: 42%;
+}
+
+.latest__play:not([disabled]):hover .latest__play-mark,
+.latest__play:focus-visible .latest__play-mark {
+  background-color: var(--bone);
+}
+
+/* Sits flush against the blade as one two-part bar. Floating the label straight
+   over the artwork made it unreadable — the thumbnails are busy and light. */
+.latest__play-label {
+  position: absolute;
+  left: var(--play-size);
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  height: var(--play-size);
+  padding: 0 var(--space-3);
+  background-color: var(--ink-deep);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.latest__play:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: -2px;
+}
+
+/* --- stacked ------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .latest__inner {
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .latest__body {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  /* The episode leads on a small screen; the title reads underneath it. */
+  .latest__media {
+    order: -1;
+  }
+
+  .latest__meta {
+    gap: var(--space-3);
+  }
+
+  .latest__action {
+    margin-top: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .latest__thumb,
+  .latest__play-mark,
+  .latest__action {
+    transition-duration: 1ms;
+  }
+}

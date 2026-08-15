@@ -4,6 +4,7 @@ import emailjs from 'emailjs-com';
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import { ACCENT_COLOR } from '../theme';
 import './Contact.css';
 import { Helmet } from 'react-helmet-async';
 
@@ -70,7 +71,7 @@ const Contact = () => {
     fullScreen: { enable: false, zIndex: 1 },
     fpsLimit: 60,
     particles: {
-      color: { value: "#2e9cddff" },
+      color: { value: ACCENT_COLOR },
       links: { enable: false },
       move: {
         direction: "none",

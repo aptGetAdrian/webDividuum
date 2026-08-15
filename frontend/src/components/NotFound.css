@@ -4,12 +4,8 @@
   align-items: center;
   justify-content: center;
   padding: 120px 0 80px;
-  background-color: #0a1f26;
+  background-color: var(--background-color);
   color: var(--text-color);
-}
-
-h1 {
-  margin-right: 3vh;
 }
 
 .not-found-content {
@@ -20,6 +16,7 @@ h1 {
 
 .not-found-content h1 {
   font-size: 8rem;
+  margin-right: 3vh;
   margin-bottom: 0.5rem;
   background: linear-gradient(to right, var(--text-color), var(--accent-color));
   -webkit-background-clip: text;
@@ -43,10 +40,10 @@ h1 {
 .back-home-button {
   display: inline-block;
   padding: 1rem 2rem;
-  background-color: #12353e;
+  background-color: var(--btn-dark-bg);
   color: var(--text-color);
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   transition: all 0.3s ease;
   border: none;
@@ -55,7 +52,7 @@ h1 {
 }
 
 .back-home-button:hover {
-  background-color: #2e545f;
+  background-color: var(--btn-dark-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
@@ -71,6 +68,7 @@ h1 {
 
   .not-found-content h1 {
     font-size: 6rem;
+    margin-right: 0vh;
   }
 
   .not-found-content h2 {
@@ -80,21 +78,15 @@ h1 {
   .not-found-content p {
     font-size: 1.1rem;
   }
-  h1 {
-    margin-right: 0vh;
-  }
 }
 
 @media (max-width: 480px) {
   .not-found-content h1 {
     font-size: 4rem;
+    margin-right: 0vh;
   }
 
   .not-found-content h2 {
     font-size: 1.5rem;
-  }
-
-  h1 {
-    margin-right: 0vh;
   }
 }

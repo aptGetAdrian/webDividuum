@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import { ACCENT_COLOR } from '../theme';
 import './Hero.css';
 import './FeaturedGuests.css';
 import { Helmet } from 'react-helmet-async';
@@ -27,7 +28,7 @@ const Episodes = () => {
     fullScreen: { enable: false, zIndex: 1 },
     fpsLimit: 60,
     particles: {
-      color: { value: "#2e9cddff" },
+      color: { value: ACCENT_COLOR },
       links: { enable: false },
       move: {
         direction: "none",
@@ -100,7 +101,7 @@ const Episodes = () => {
         height: 'auto',
         maxWidth: '350px',
         background: 'rgba(20, 20, 20, 0.95)',
-        borderRadius: '4px',
+        borderRadius: 'var(--radius-sm)',
         overflow: 'hidden',
         boxShadow: '0 4px 23px 0 rgba(0,0,0,0.45)',
         textDecoration: 'none',
@@ -196,7 +197,7 @@ const Episodes = () => {
                     : 'rgba(20, 20, 20, 0.7)',
                 color: 'var(--text-color)',
                 border: activeView === 'all' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '12px',
+                borderRadius: 'var(--radius-card)',
                 fontSize: '1.1rem',
                 fontWeight: '600',
                 textTransform: 'uppercase',
@@ -223,7 +224,7 @@ const Episodes = () => {
                     : 'rgba(20, 20, 20, 0.7)',
                 color: 'var(--text-color)',
                 border: activeView === 'categories' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '12px',
+                borderRadius: 'var(--radius-card)',
                 fontSize: '1.1rem',
                 fontWeight: '600',
                 textTransform: 'uppercase',
@@ -280,7 +281,7 @@ const Episodes = () => {
                   background: 'rgba(255, 107, 107, 0.2)',
                   color: '#ff6b6b',
                   border: '1px solid rgba(255, 107, 107, 0.3)',
-                  borderRadius: '8px',
+                  borderRadius: 'var(--radius-md)',
                   cursor: 'pointer',
                 }}
               >

@@ -1,13 +1,5 @@
-/* ===== VARIABLES ===== */
-:root {
-  --text-color: #ffffff;
-  --text-secondary: #cccccc;
-  --accent-color: #2a7185;
-  --dark-bg: #0a1f26;
-  --dark-overlay: rgba(14, 14, 14, 0.8);
-  --coffee-color: #ffdd44;
-  --coffee-hover: #ffcc22;
-}
+/* Tokens (--text-color, --accent-color, --coffee-color, --coffee-hover, --dark-overlay)
+   live in src/index.css — this file no longer redeclares :root. */
 
 /* ===== HERO SECTION COMMON STYLES ===== */
 .hero, .hero-second, .hero-support {
@@ -22,16 +14,16 @@
 
 .hero-second {
   min-height: 90vh;
-  background-color: var(--dark-bg);
+  background-color: var(--background-color);
   margin-top: -2px;
-  padding: 120px 0;
+  padding: var(--space-7) 0;
 }
 
 .hero-support {
   min-height: 70vh;
-  background: linear-gradient(135deg, var(--dark-bg) 0%, rgba(42, 113, 133, 0.1) 100%);
+  background: linear-gradient(135deg, var(--background-color) 0%, rgba(42, 113, 133, 0.1) 100%);
   margin-top: -2px;
-  padding: 60px 0;
+  padding: var(--space-7) 0;
 }
 
 .hero-overlay, .hero-overlay-second, .hero-overlay-support {
@@ -122,14 +114,14 @@
 }
 
 .hero-text-second h1 {
-  font-size: 4rem;
-  margin-bottom: 1.7rem;
-  line-height: 1.1;
+  font-size: 2.75rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.15;
   color: var(--text-color);
 }
 
 .hero-text-support h1 {
-  font-size: 3rem;
+  font-size: 2.75rem;
   margin-bottom: 1.5rem;
   background: linear-gradient(45deg, var(--coffee-color), var(--accent-color));
   -webkit-background-clip: text;
@@ -145,7 +137,7 @@
 }
 
 .hero-text-second p {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   margin-bottom: 2.5rem;
   color: var(--text-color);
   font-weight: 500;
@@ -153,7 +145,7 @@
 }
 
 .hero-text-support p {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: var(--text-color);
   margin-bottom: 2.5rem;
   line-height: 1.7;
@@ -191,7 +183,7 @@
   background: linear-gradient(45deg, var(--coffee-color), #ffaa00);
   color: #2d1810;
   border: none;
-  border-radius: 50px;
+  border-radius: var(--radius-pill);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -292,14 +284,13 @@
   padding-bottom: 56.25%;
   overflow: hidden;
   height: 0;
-  border-radius: 3px;
+  border-radius: var(--radius-md);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   background-color: rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .video-container-second {
-  border-radius: 3px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
 }
 
@@ -314,14 +305,14 @@
   left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 3px;
+  border-radius: var(--radius-md);
 }
 
 /* Video thumbnail styles */
 .video-thumbnail, .video-thumbnail-second {
   position: relative;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -332,7 +323,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 3px;
+  border-radius: var(--radius-md);
 }
 
 .video-thumbnail:hover {
@@ -420,26 +411,26 @@
 }
 
 /* ===== BUTTONS ===== */
-.btn-primary-second {
+.btn-primary--dark {
   padding: 1rem 2.5rem;
   font-size: 1.2rem;
   font-weight: 600;
-  background-color: #12353e;
+  background-color: var(--btn-dark-bg);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-color);
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-.btn-primary-second:hover {
+.btn-primary--dark:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  background-color: #2e545f;
+  background-color: var(--btn-dark-bg-hover);
 }
 
-.btn-primary-second:active {
+.btn-primary--dark:active {
   transform: translateY(1px);
 }
 
@@ -520,7 +511,7 @@
   justify-content: center;
   height: 200px;
   background: #f0f0f0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: #666;
   font-size: 1.1rem;
 }
@@ -580,16 +571,16 @@
     max-width: 80%;
   }
 
-  .hero-text h1, .hero-text-second h1, .hero-text-support h1 {
+  .hero-text h1 {
     font-size: 2.5rem;
   }
-  
+
+  .hero-text-second h1, .hero-text-support h1 {
+    font-size: 2.2rem;
+  }
+
   .hero-text-second h1 {
     text-align: center;
-  }
-  
-  .hero-text-support h1 {
-    font-size: 2.2rem;
   }
 
   .hero-video, .hero-video-second {
@@ -599,13 +590,9 @@
   
   .hero-second, .hero-support {
     min-height: auto;
-    padding: 60px 0;
+    padding: var(--space-5) 0;
   }
-  
-  .hero-support {
-    padding: 50px 0;
-  }
-  
+
   .hero-content-second {
     padding: 2rem;
     gap: 2rem;
@@ -632,7 +619,7 @@
   }
   
   .video-container-second {
-    border-radius: 3px;
+    border-radius: var(--radius-md);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   }
   
@@ -657,23 +644,23 @@
   }
   
   .hero-second, .hero-support {
-    padding: 40px 0;
+    padding: var(--space-4) 0;
   }
-  
+
   .hero-text-second {
     max-height: 400px;
   }
   
   .hero-text-second h1 {
-    font-size: 2.8rem;
+    font-size: 2rem;
     text-align: center;
   }
-  
+
   .hero-text-support h1 {
     font-size: 2rem;
   }
-  
-  .hero-text-support p {
+
+  .hero-text-second p, .hero-text-support p {
     font-size: 1.1rem;
   }
   
@@ -712,23 +699,23 @@
   }
   
   .hero-text-second h1 {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     margin-bottom: 1.2rem;
     margin-top: 3rem;
   }
-  
+
   .hero-text-support h1 {
     font-size: 1.8rem;
     margin-bottom: 1rem;
   }
-  
-  .hero-text-support p {
+
+  .hero-text-second p, .hero-text-support p {
     font-size: 1rem;
     margin-bottom: 2rem;
   }
   
   .video-container-second {
-    border-radius: 3px;
+    border-radius: var(--radius-md);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
   
@@ -825,7 +812,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: linear-gradient(135deg, var(--dark-bg) 0%, rgb(42, 113, 133) 100%);
+  background: linear-gradient(135deg, var(--background-color) 0%, rgb(42, 113, 133) 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -850,7 +837,7 @@
 .loader-content img {
   width: 70%;
   max-width: 280px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   opacity: 0.9;
   filter: drop-shadow(0 0 25px rgba(42, 113, 133, 0.5));
   margin-bottom: 1.5rem;

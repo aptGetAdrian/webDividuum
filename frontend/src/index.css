@@ -1,15 +1,68 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Anton&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap");
 
 :root {
   --primary-color: #1a4b5c;
   --secondary-color: #2a7185;
-  --accent-color: #3dd8ff;
+  --accent-color: #2e9cdd;
   --background-color: #0a1f26;
   --text-color: #ffffff;
   --text-secondary: #e0e0e0;
-  --navbar-height: 76px;
-  --navbar-height-scrolled: 68px;
+  --dark-overlay: rgba(14, 14, 14, 0.8);
+  --coffee-color: #ffdd44;
+  --coffee-hover: #ffcc22;
+  --btn-dark-bg: #12353e;
+  --btn-dark-bg-hover: #2e545f;
+  --navbar-height: 5.5rem;
+  --navbar-height-scrolled: 4.5rem;
+
+  /* spacing scale (8px base) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+  --space-7: 96px;
+
+  /* corner-radius scale — LEGACY. Only Hero.css still uses these, and the hero is
+     deliberately unchanged. Redesigned sections use hard edges (radius 0) instead. */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-card: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 50px;
+
+  /* ---------------------------------------------------------------
+     REDESIGN TOKENS
+     Direction: concrete / brutalist print. Hard edges, hairline rules,
+     rationed color. The teal family is inherited from the old palette
+     on purpose — --ink must stay #0a1f26 because Navbar.css hardcodes
+     rgba(10, 31, 38, …) and the navbar is unchanged.
+     --------------------------------------------------------------- */
+
+  /* surfaces, dark → light */
+  --ink: #0a1f26;        /* page ground. Must match the navbar's rgba. */
+  --ink-deep: #071619;   /* recessed: tile wells, media letterboxing */
+  --panel: #12353e;      /* raised: reveal panels, cards */
+  --rule: #1e4a57;       /* hairline rules and grid seams */
+  --concrete: #7c949c;   /* muted mono labels, metadata */
+  --bone: #ededea;       /* primary text — warmer than #fff, less glare */
+  --signal: #2e9cdd;     /* the only color. Links, active state, the mark. */
+
+  /* type roles */
+  --font-display: "Anton", sans-serif;   /* headings — rhymes with the navbar */
+  --font-body: "Inter", sans-serif;      /* Slovenian body copy */
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace; /* labels, counts, meta */
+
+  --track-display: 0.35em; /* matches .nav-links a */
+  --track-mono: 0.18em;
+
+  /* motion — snappy, not eased-soft */
+  --dur-snap: 120ms;
+  --dur-reveal: 300ms;
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
 }
 
 html {
