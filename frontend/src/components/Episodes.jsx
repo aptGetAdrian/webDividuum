@@ -1,140 +1,84 @@
-import { useEffect, useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import Particles from "react-tsparticles";
-import { loadSlim } from "tsparticles-slim";
-import useDocumentTitle from '../hooks/useDocumentTitle';
-import { ACCENT_COLOR } from '../theme';
-import './Hero.css';
-import './FeaturedGuests.css';
-import { Helmet } from 'react-helmet-async';
+import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import useDocumentTitle from "../hooks/useDocumentTitle";
+import useReveal from "../hooks/useReveal";
+import { formatDate, formatDuration, parseTitle, pickThumbnail } from "../lib/episodeMeta";
+import "./Episodes.css";
+
+const VIEWS = [
+  { id: "all", label: "Vse epizode" },
+  { id: "categories", label: "Kategorije" },
+];
+
+/**
+ * Playlist titles carry the same "| Individuum Podcast" tail as video titles, and
+ * some are additionally authored as "Ime - opis". Strip both; show only the name.
+ */
+const formatPlaylistTitle = (title) => parseTitle(title).title.split(" - ")[0].trim();
+
+const EpisodeCard = ({ video }) => {
+  const { title, episode } = parseTitle(video.snippet.title);
+  const duration = formatDuration(video.contentDetails?.duration);
+  const published = formatDate(video.snippet.publishedAt);
+  const thumbnail = pickThumbnail(video.snippet.thumbnails);
+
+  return (
+    <a
+      className="ep-card"
+      href={`https://www.youtube.com/watch?v=${video.id}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span className="ep-card__media">
+        {thumbnail && (
+          <img className="ep-card__thumb" src={thumbnail} alt="" loading="lazy" decoding="async" />
+        )}
+        {duration && <span className="ep-card__duration">{duration}</span>}
+      </span>
+
+      <span className="ep-card__body">
+        <span className="ep-card__meta">
+          <span className="ep-card__no">{episode ? `#${episode}` : "—"}</span>
+          {published && <span className="ep-card__date">{published}</span>}
+        </span>
+        <span className="ep-card__title">{title}</span>
+      </span>
+    </a>
+  );
+};
 
 const Episodes = () => {
   const [episodes, setEpisodes] = useState([]);
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeView, setActiveView] = useState('all');
-  const [error, setError] = useState(null);
-  const [particlesLoaded2, setParticlesLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  const [view, setView] = useState("all");
+  const [headRef, headShown] = useReveal();
 
   const API_ADDRESS = import.meta.env.VITE_API_ADDRESS;
-  useDocumentTitle('Individuum epizode');
+  useDocumentTitle("Individuum epizode");
 
-  // === Particles setup ===
-  const particlesLoaded = () => setParticlesLoaded(true);
-  const particlesInit = async (engine) => await loadSlim(engine);
-
-  const particlesOptions = {
-    background: { color: { value: "transparent" } },
-    fullScreen: { enable: false, zIndex: 1 },
-    fpsLimit: 60,
-    particles: {
-      color: { value: ACCENT_COLOR },
-      links: { enable: false },
-      move: {
-        direction: "none",
-        enable: true,
-        outModes: { default: "out" },
-        random: true,
-        speed: 0.25,
-        straight: false,
-      },
-      number: { density: { enable: true, area: 800 }, value: 150 },
-      opacity: {
-        value: { min: 0.1, max: 0.3 },
-        animation: { enable: true, speed: 0.3, minimumValue: 0.1, sync: false },
-      },
-      shape: { type: "circle" },
-      size: { value: { min: 0.5, max: 2 } },
-    },
-    detectRetina: true,
-  };
-
-
-  const particlesMemo = useMemo(
-    () => (
-      <Particles
-        id="tsparticles"
-        init={particlesInit}
-        loaded={particlesLoaded2}
-        options={particlesOptions}
-      />
-    ),
-    []
-  );
-
-  // === Fetch YouTube data ===
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        setError(null);
+        setError(false);
         const response = await fetch(`${API_ADDRESS}/api/youtube-data`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setEpisodes(data.episodes || []);
         setPlaylists(data.playlists || []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to load episodes. Please try again later.');
+      } catch (err) {
+        console.error("Error fetching episodes:", err);
+        setError(true);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
-  }, []);
+  }, [API_ADDRESS]);
 
-  const formatPlaylistTitle = (title) => title.split(' - ')[0].trim();
-
-  const renderEpisodeCard = (episode, index) => (
-    <motion.a
-      key={episode.id}
-      href={`https://www.youtube.com/watch?v=${episode.id}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="episode-card"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.1 } }}
-      whileHover={{ scale: 1.03, transition: { duration: 0.1, stiffness: 300 } }}
-      style={{
-        width: '100%',
-        height: 'auto',
-        maxWidth: '350px',
-        background: 'rgba(20, 20, 20, 0.95)',
-        borderRadius: 'var(--radius-sm)',
-        overflow: 'hidden',
-        boxShadow: '0 4px 23px 0 rgba(0,0,0,0.45)',
-        textDecoration: 'none',
-        color: 'inherit',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <img
-        src={
-          episode.snippet.thumbnails.maxres?.url ||
-          episode.snippet.thumbnails.high?.url ||
-          episode.snippet.thumbnails.medium?.url ||
-          episode.snippet.thumbnails.default?.url
-        }
-        alt={episode.snippet.title}
-        style={{ width: '100%', height: 'auto', display: 'block' }}
-      />
-      <div style={{ padding: '1rem', width: '100%' }}>
-        <h2 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem 0', color: 'var(--text-color, #fff)' }}>
-          {episode.snippet.title}
-        </h2>
-        <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary, #aaa)' }}>
-          {new Date(episode.snippet.publishedAt).toLocaleDateString('sl-SI', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-        </p>
-      </div>
-    </motion.a>
-  );
+  const categories = playlists.filter((p) => p.snippet.title !== "Individuum podcast");
 
   return (
     <>
@@ -146,268 +90,79 @@ const Episodes = () => {
         />
         <link rel="canonical" href="/epizode" />
       </Helmet>
-      <motion.section
-        className="hero episodes-section"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        style={{
-          minHeight: '100vh',
-          background: 'none',
-          marginTop: '4.5vh',
-          marginBottom: '5vh',
-          position: 'relative',
-          overflow: 'hidden',
-          isolation: 'isolate',
-        }}
-      >
-        {/* Particles Background */}
-        <div className="particles-container">{particlesMemo}</div>
 
-        <div
-          className="container hero-content"
-          style={{
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '0 20px',
-            position: 'relative',
-            zIndex: 2,
-          }}
-        >
-          {/* === Toggle Buttons (same position & spacing as original) === */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            style={{
-              display: 'flex',
-              gap: '1rem',
-              marginBottom: '3vh',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-            }}
-          >
-            <button
-              onClick={() => setActiveView('all')}
-              style={{
-                padding: '0.8rem 1.5rem',
-                background:
-                  activeView === 'all'
-                    ? 'linear-gradient(135deg, var(--accent-color), rgba(255, 255, 255, 0.1))'
-                    : 'rgba(20, 20, 20, 0.7)',
-                color: 'var(--text-color)',
-                border: activeView === 'all' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: 'var(--radius-card)',
-                fontSize: '1.1rem',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                cursor: 'pointer',
-                backdropFilter: 'blur(10px)',
-                boxShadow:
-                  activeView === 'all'
-                    ? '0 4px 15px rgba(0,0,0,0.3)'
-                    : '0 2px 10px rgba(0,0,0,0.2)',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Seznam epizod
-            </button>
+      <main className={`episodes${headShown ? " is-in" : ""}`} ref={headRef}>
+        <div className="episodes__inner">
+          <p className="episodes__eyebrow" data-reveal>
+            Arhiv
+          </p>
 
-            <button
-              onClick={() => setActiveView('categories')}
-              style={{
-                padding: '0.8rem 1.5rem',
-                background:
-                  activeView === 'categories'
-                    ? 'linear-gradient(135deg, var(--accent-color), rgba(255, 255, 255, 0.1))'
-                    : 'rgba(20, 20, 20, 0.7)',
-                color: 'var(--text-color)',
-                border: activeView === 'categories' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: 'var(--radius-card)',
-                fontSize: '1.1rem',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                cursor: 'pointer',
-                backdropFilter: 'blur(10px)',
-                boxShadow:
-                  activeView === 'categories'
-                    ? '0 4px 15px rgba(0,0,0,0.3)'
-                    : '0 2px 10px rgba(0,0,0,0.2)',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Kategorije
-            </button>
-          </motion.div>
+          <div className="episodes__head">
+            <h1 className="episodes__title" data-reveal style={{ "--reveal-i": 1 }}>
+              Epizode
+            </h1>
+            {!loading && !error && (
+              <p className="episodes__count" data-reveal style={{ "--reveal-i": 2 }}>
+                {episodes.length} epizod · {categories.length} kategorij
+              </p>
+            )}
+          </div>
 
-          {/* === Main content === */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '1.5rem',
-                padding: '2rem',
-                background: 'rgba(139, 0, 0, 0.1)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '16px',
-                boxShadow: '0 8px 32px 0 rgba(139,0,0,0.3)',
-                maxWidth: '400px',
-                width: '100%',
-                border: '1px solid rgba(139, 0, 0, 0.3)',
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: '1.5rem',
-                  fontWeight: '600',
-                  color: '#ff6b6b',
-                  textAlign: 'center',
-                  margin: 0,
-                }}
-              >
-                {error}
-              </h2>
+          <div className="episodes__views" role="tablist" aria-label="Pogled" data-reveal style={{ "--reveal-i": 2 }}>
+            {VIEWS.map((option) => (
               <button
-                onClick={() => window.location.reload()}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: 'rgba(255, 107, 107, 0.2)',
-                  color: '#ff6b6b',
-                  border: '1px solid rgba(255, 107, 107, 0.3)',
-                  borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer',
-                }}
+                key={option.id}
+                type="button"
+                role="tab"
+                aria-selected={view === option.id}
+                className={`episodes__view${view === option.id ? " is-active" : ""}`}
+                onClick={() => setView(option.id)}
               >
-                Retry
+                {option.label}
               </button>
-            </motion.div>
+            ))}
+          </div>
+
+          {error && (
+            <div className="episodes__notice">
+              <p className="episodes__notice-text">Epizod ni bilo mogoče naložiti.</p>
+              <button type="button" className="episodes__retry" onClick={() => window.location.reload()}>
+                Poskusi znova
+              </button>
+            </div>
           )}
 
-          {loading ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '1.5rem',
-                padding: '2rem',
-                background: 'rgba(10, 31, 38, 0.4)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '16px',
-                boxShadow: '0 8px 32px 0 rgba(0,0,0,0.3)',
-                maxWidth: '400px',
-                width: '100%',
-              }}
-            >
-              <div
-                style={{
-                  width: '50px',
-                  height: '50px',
-                  border: '3px solid rgba(255, 255, 255, 0.1)',
-                  borderTop: '3px solid var(--accent-color)',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                }}
-              />
-              <h2
-                style={{
-                  fontSize: '1.5rem',
-                  fontWeight: '600',
-                  color: 'var(--text-color)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  textAlign: 'center',
-                  margin: 0,
-                  background: 'linear-gradient(to right, var(--text-color), var(--accent-color))',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                Nalagam {activeView === 'all' ? 'epizode' : 'kategorije'}...
-              </h2>
-            </motion.div>
-          ) : (
-            <>
-              {activeView === 'all' && (
-                <div
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '3.3rem',
-                    justifyContent: 'center',
-                    margin: '0 auto',
-                    paddingBottom: '2.5vh',
-                  }}
-                >
-                  {episodes.map((episode, index) => renderEpisodeCard(episode, index))}
-                </div>
-              )}
+          {loading && !error && <p className="episodes__notice-text">Nalagam epizode…</p>}
 
-              {activeView === 'categories' && (
-                <div style={{ width: '100%', paddingBottom: '2.5vh' }}>
-                  {playlists
-                    .filter((p) => p.snippet.title !== 'Individuum podcast')
-                    .map((playlist, playlistIndex) => (
-                      <motion.div
-                        key={playlist.id}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: playlistIndex * 0.2 }}
-                        style={{ marginBottom: '4rem' }}
-                      >
-                        <motion.h3
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.8, delay: playlistIndex * 0.2 + 0.1 }}
-                          style={{
-                            fontSize: '1.8rem',
-                            fontWeight: '600',
-                            color: 'var(--text-color)',
-                            textTransform: 'uppercase',
-                            textAlign: 'center',
-                            marginBottom: '2rem',
-                            background: 'linear-gradient(to right, var(--text-color), var(--accent-color))',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            fontFamily: 'Anton, sans-serif',
-                            letterSpacing: '0.37rem',
-                          }}
-                        >
-                          {formatPlaylistTitle(playlist.snippet.title)}
-                        </motion.h3>
+          {!loading && !error && view === "all" && (
+            <div className="ep-grid">
+              {episodes.map((video) => (
+                <EpisodeCard key={video.id} video={video} />
+              ))}
+            </div>
+          )}
 
-                        <div
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '3.3rem',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          {playlist.videos.map((episode, index) =>
-                            renderEpisodeCard(episode, playlistIndex * 3 + index)
-                          )}
-                        </div>
-                      </motion.div>
+          {!loading && !error && view === "categories" && (
+            <div className="episodes__categories">
+              {categories.map((playlist) => (
+                <section className="episodes__category" key={playlist.id}>
+                  <h2 className="episodes__category-title">
+                    {formatPlaylistTitle(playlist.snippet.title)}
+                    <span className="episodes__category-count">{playlist.videos.length}</span>
+                  </h2>
+                  <div className="ep-grid">
+                    {/* A video can legitimately appear twice in one playlist, so the
+                        position is part of the key — id alone collides. */}
+                    {playlist.videos.map((video, i) => (
+                      <EpisodeCard key={`${playlist.id}-${video.id}-${i}`} video={video} />
                     ))}
-                </div>
-              )}
-            </>
+                  </div>
+                </section>
+              ))}
+            </div>
           )}
         </div>
-      </motion.section>
+      </main>
     </>
   );
 };

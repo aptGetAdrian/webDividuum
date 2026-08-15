@@ -28,7 +28,7 @@ const Home = () => {
         <Hero />
         <LatestEpisode />
         <FeaturedGuests />
-        <Support id="support" />
+        <Support />
       </main>
     </>
   );

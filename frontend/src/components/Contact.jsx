@@ -1,191 +1,102 @@
-import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import emailjs from 'emailjs-com';
-import Particles from "react-tsparticles";
-import { loadSlim } from "tsparticles-slim";
-import useDocumentTitle from '../hooks/useDocumentTitle';
-import { ACCENT_COLOR } from '../theme';
-import './Contact.css';
-import { Helmet } from 'react-helmet-async';
+import { useState, useEffect, useCallback } from "react";
+import { Helmet } from "react-helmet-async";
+import emailjs from "emailjs-com";
+import useDocumentTitle from "../hooks/useDocumentTitle";
+import useReveal from "../hooks/useReveal";
+import "./Contact.css";
 
-// Timer component to show seconds left without re-rendering the entire form
+const RATE_LIMIT = 2;
+const RATE_LIMIT_WINDOW = 60 * 1000;
+const STORAGE_KEY = "contact_form_submissions";
+
+const FIELDS = [
+  { name: "name", label: "Ime in priimek", type: "text", autoComplete: "name" },
+  { name: "email", label: "E-pošta", type: "email", autoComplete: "email" },
+  { name: "subject", label: "Zadeva", type: "text", autoComplete: "off" },
+];
+
+/** Counts down without re-rendering the form around it. */
 const RateLimitTimer = ({ resetTime }) => {
   const [secondsLeft, setSecondsLeft] = useState(0);
 
   useEffect(() => {
-    if (!resetTime) return;
-
-    const update = () => {
-      setSecondsLeft(Math.max(0, Math.ceil((resetTime - Date.now()) / 1000)));
-    };
-
-    update(); // initial run
+    if (!resetTime) return undefined;
+    const update = () => setSecondsLeft(Math.max(0, Math.ceil((resetTime - Date.now()) / 1000)));
+    update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, [resetTime]);
 
-  if (secondsLeft <= 0) return null;
-  return <>{`Počakajte ${secondsLeft}s`}</>;
+  // Never return nothing: the button label is this component, and between the
+  // countdown hitting zero and the next rate-limit poll it would render empty.
+  return <>{secondsLeft > 0 ? `Počakajte ${secondsLeft}s` : "Počakajte"}</>;
 };
 
 const Contact = () => {
-  useDocumentTitle('Individuum kontakt');
+  useDocumentTitle("Individuum kontakt");
 
-  const [particlesLoaded2, setParticlesLoaded] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [rateLimit, setRateLimit] = useState({ remaining: RATE_LIMIT, resetTime: null, isBlocked: false });
+  const [sectionRef, shown] = useReveal();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
+  const checkRateLimit = useCallback(() => {
+    const now = Date.now();
+    const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    const recent = submissions.filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(recent));
 
-  const [status, setStatus] = useState({
-    type: '',
-    message: ''
-  });
-
-  const [rateLimitInfo, setRateLimitInfo] = useState({
-    remaining: 2,
-    resetTime: null,
-    isBlocked: false
-  });
-
-  // Rate limiting configuration
-  const RATE_LIMIT = 2;
-  const RATE_LIMIT_WINDOW = 60 * 1000;
-  const STORAGE_KEY = 'contact_form_submissions';
-
-  const particlesLoaded = (container) => {
-    setParticlesLoaded(true);
-  };
-
-  // Initialize particles
-  const particlesInit = async (engine) => {
-    await loadSlim(engine);
-  };
-
-  // Particles configuration (unchanged)
-  const particlesOptions = {
-    background: { color: { value: "transparent" } },
-    fullScreen: { enable: false, zIndex: 1 },
-    fpsLimit: 60,
-    particles: {
-      color: { value: ACCENT_COLOR },
-      links: { enable: false },
-      move: {
-        direction: "none",
-        enable: true,
-        outModes: { default: "out" },
-        random: true,
-        speed: 0.25,
-        straight: false,
-      },
-      number: {
-        density: { enable: true, area: 800 },
-        value: 150,
-      },
-      opacity: {
-        value: { min: 0.1, max: 0.7 },
-        animation: { enable: true, speed: 0.3, minimumValue: 0.1, sync: false }
-      },
-      shape: { type: "circle" },
-      size: { value: { min: 0.5, max: 2 } },
-    },
-    detectRetina: true,
-  };
-
-  // Memoized particles so they don’t re-render
-  const particlesMemo = useMemo(() => (
-    <Particles
-      id="tsparticles"
-      init={particlesInit}
-      loaded={particlesLoaded2}
-      options={particlesOptions}
-    />
-  ), []); // empty deps — created once
-
-  // Check rate limit on mount
-  useEffect(() => {
-    checkRateLimit();
-    const interval = setInterval(checkRateLimit, 5000); // check every 5 seconds
-    return () => clearInterval(interval);
+    const remaining = Math.max(0, RATE_LIMIT - recent.length);
+    setRateLimit({
+      remaining,
+      isBlocked: remaining === 0,
+      resetTime: remaining === 0 && recent.length > 0 ? recent[0] + RATE_LIMIT_WINDOW : null,
+    });
   }, []);
 
-  const checkRateLimit = () => {
-    const now = Date.now();
-    const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    const recentSubmissions = submissions.filter(
-      timestamp => now - timestamp < RATE_LIMIT_WINDOW
-    );
+  useEffect(() => {
+    checkRateLimit();
+    const interval = setInterval(checkRateLimit, 5000);
+    return () => clearInterval(interval);
+  }, [checkRateLimit]);
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(recentSubmissions));
-
-    const remaining = Math.max(0, RATE_LIMIT - recentSubmissions.length);
-    const isBlocked = remaining === 0;
-
-    let resetTime = null;
-    if (isBlocked && recentSubmissions.length > 0) {
-      resetTime = recentSubmissions[0] + RATE_LIMIT_WINDOW;
-    }
-
-    setRateLimitInfo({ remaining, resetTime, isBlocked });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addSubmissionTimestamp = () => {
-    const now = Date.now();
-    const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    submissions.push(now);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
-  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (rateLimitInfo.isBlocked) {
-      setStatus({
-        type: 'error',
-        message: 'Preveč zahtev. Prosimo, poskusite kasneje.'
-      });
+    if (rateLimit.isBlocked) {
+      setStatus({ type: "error", message: "Preveč sporočil. Poskusite čez minuto." });
       return;
     }
 
-    setStatus({ type: 'loading', message: 'Pošiljanje...' });
+    setStatus({ type: "loading", message: "" });
 
     try {
       await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-        },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        { ...formData },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
       );
 
-      addSubmissionTimestamp();
+      const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      submissions.push(Date.now());
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
       checkRateLimit();
 
-      setStatus({
-        type: 'success',
-        message: 'Sporočilo uspešno poslano! Hvala za vaše sporočilo.'
-      });
-
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setStatus({ type: "success", message: "Sporočilo je poslano. Hvala — oglasiva se čim prej." });
+      setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      setStatus({
-        type: 'error',
-        message: 'Prišlo je do napake. Prosimo, poskusite ponovno.'
-      });
+      console.error("Contact form failed:", error);
+      setStatus({ type: "error", message: "Sporočila ni bilo mogoče poslati. Poskusite znova." });
     }
   };
+
+  const sending = status.type === "loading";
 
   return (
     <>
@@ -198,107 +109,90 @@ const Contact = () => {
         <link rel="canonical" href="/kontakt" />
       </Helmet>
 
-      <section className="contact-section">
-        {/* Particles Background */}
-        <div className="particles-container">
-          {particlesMemo}
-        </div>
+      <main className={`contact${shown ? " is-in" : ""}`} ref={sectionRef}>
+        <div className="contact__inner">
+          <p className="contact__eyebrow" data-reveal>
+            Kontakt
+          </p>
 
-        <div className="container">
-          <motion.div
-            className="contact-content"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1>VSTOPITE V STIK Z NAMI</h1>
-            <p className="contact-description">
-              Imate vprašanje, predlog ali želite deliti svojo zgodbo? Pišite nam!
-            </p>
+          <div className="contact__grid">
+            <div className="contact__intro">
+              <h1 className="contact__title" data-reveal style={{ "--reveal-i": 1 }}>
+                Vstopite v stik z nami
+              </h1>
+              <p className="contact__lead" data-reveal style={{ "--reveal-i": 2 }}>
+                Imate vprašanje, predlog ali želite deliti svojo zgodbo? Pišite nam!
+              </p>
+            </div>
 
-            <form onSubmit={handleSubmit} className="contact-form">
-              <div className="form-group">
-                <label htmlFor="name">Ime in priimek</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="Vnesite vaše ime in priimek"
-                />
-              </div>
+            <form className="contact__form" onSubmit={handleSubmit} data-reveal style={{ "--reveal-i": 2 }}>
+              {FIELDS.map((field) => (
+                <div className="contact__field" key={field.name}>
+                  <label className="contact__label" htmlFor={field.name}>
+                    {field.label}
+                  </label>
+                  <input
+                    className="contact__input"
+                    id={field.name}
+                    name={field.name}
+                    type={field.type}
+                    autoComplete={field.autoComplete}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              ))}
 
-              <div className="form-group">
-                <label htmlFor="email">E-pošta</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="Vnesite vaš e-poštni naslov"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="subject">Zadeva</label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  placeholder="Vnesite zadevo sporočila"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="message">Sporočilo</label>
+              <div className="contact__field">
+                <label className="contact__label" htmlFor="message">
+                  Sporočilo
+                </label>
                 <textarea
+                  className="contact__input contact__input--area"
                   id="message"
                   name="message"
+                  rows="7"
                   value={formData.message}
                   onChange={handleChange}
                   required
-                  placeholder="Napišite vaše sporočilo"
-                  rows="6"
                 />
               </div>
 
-              <button
-                type="submit"
-                className={`submit-button ${status.type === 'loading' ? 'loading' : ''} ${rateLimitInfo.isBlocked ? 'disabled' : ''}`}
-                disabled={status.type === 'loading' || rateLimitInfo.isBlocked}
-              >
-                {rateLimitInfo.isBlocked
-                  ? <RateLimitTimer resetTime={rateLimitInfo.resetTime} />
-                  : 'Pošlji sporočilo'}
-              </button>
-
-              {rateLimitInfo.remaining < 2 && !rateLimitInfo.isBlocked && (
-                <div className="rate-limit-warning">
-                  Še {rateLimitInfo.remaining} sporočil{rateLimitInfo.remaining === 1 ? 'o' : 'i'} to minuto
-                </div>
-              )}
-
-              {status.message && (
-                <motion.div
-                  className={`status-message ${status.type}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+              <div className="contact__actions">
+                <button
+                  type="submit"
+                  className="contact__submit"
+                  disabled={sending || rateLimit.isBlocked}
                 >
-                  {status.message}
-                </motion.div>
-              )}
+                  {rateLimit.isBlocked ? (
+                    <RateLimitTimer resetTime={rateLimit.resetTime} />
+                  ) : sending ? (
+                    "Pošiljam…"
+                  ) : (
+                    "Pošlji sporočilo"
+                  )}
+                </button>
+
+                {rateLimit.remaining < RATE_LIMIT && !rateLimit.isBlocked && (
+                  <p className="contact__quota">
+                    Še {rateLimit.remaining} sporočil{rateLimit.remaining === 1 ? "o" : "i"} to minuto
+                  </p>
+                )}
+              </div>
+
+              {/* Announced to screen readers — the old version changed silently. */}
+              <p
+                className={`contact__status${status.message ? ` contact__status--${status.type}` : ""}`}
+                role="status"
+                aria-live="polite"
+              >
+                {status.message}
+              </p>
             </form>
-          </motion.div>
+          </div>
         </div>
-      </section>
+      </main>
     </>
   );
 };

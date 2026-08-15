@@ -1,0 +1,349 @@
+/* =============================================================================
+   EPIZODE — the archive.
+
+   The grid is a contact sheet: cards sit flush and the 1px seams between them
+   are the container's background showing through the gap, the same construction
+   as the guests ring. No card borders, no radius, no shadows.
+   ========================================================================== */
+
+.episodes {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--ink);
+}
+
+.episodes::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.episodes__inner {
+  position: relative;
+  z-index: 1;
+  /* Clear the fixed navbar. */
+  padding: calc(var(--navbar-height) + var(--space-5)) 0 var(--space-7);
+}
+
+/* --- page head ----------------------------------------------------------- */
+
+.episodes__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+  padding: 0 var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.episodes__eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--rule);
+}
+
+.episodes__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+}
+
+.episodes__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.episodes__count {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--concrete);
+}
+
+/* --- view switch: a hard segmented control ------------------------------- */
+
+.episodes__views {
+  display: inline-flex;
+  margin: var(--space-4) var(--space-4) var(--space-5);
+  border: 1px solid var(--rule);
+}
+
+.episodes__view {
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--concrete);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-snap) var(--ease-snap),
+    color var(--dur-snap) var(--ease-snap);
+}
+
+.episodes__view + .episodes__view {
+  border-left: 1px solid var(--rule);
+}
+
+.episodes__view:hover {
+  color: var(--bone);
+}
+
+.episodes__view.is-active {
+  background-color: var(--signal);
+  color: var(--ink);
+}
+
+.episodes__view:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: -2px;
+}
+
+/* --- states -------------------------------------------------------------- */
+
+.episodes__notice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0 var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--rule);
+}
+
+.episodes__notice-text {
+  margin: 0;
+  padding: 0 var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--concrete);
+}
+
+.episodes__notice .episodes__notice-text {
+  padding: 0;
+  color: var(--bone);
+}
+
+.episodes__retry {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--rule);
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--bone);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-snap) var(--ease-snap),
+    color var(--dur-snap) var(--ease-snap);
+}
+
+.episodes__retry:hover {
+  background-color: var(--signal);
+  color: var(--ink);
+}
+
+/* --- the contact sheet --------------------------------------------------- */
+
+.ep-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1px;
+  background-color: var(--rule); /* shows through the gap as hairline seams */
+  border-block: 1px solid var(--rule);
+}
+
+.ep-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--ink);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--dur-snap) var(--ease-snap);
+}
+
+.ep-card:hover,
+.ep-card:focus-visible {
+  background-color: var(--panel);
+}
+
+.ep-card:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: -2px;
+}
+
+.ep-card__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  background-color: var(--ink-deep);
+  overflow: hidden;
+}
+
+.ep-card__thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.05);
+  transition: filter var(--dur-snap) var(--ease-snap);
+}
+
+/* Colour marks the one you're about to open — same rule as the home page. */
+.ep-card:hover .ep-card__thumb,
+.ep-card:focus-visible .ep-card__thumb {
+  filter: grayscale(0) contrast(1);
+}
+
+.ep-card__duration {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--ink-deep);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.ep-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+}
+
+.ep-card__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.ep-card__no {
+  color: var(--signal);
+}
+
+.ep-card__date {
+  color: var(--concrete);
+}
+
+.ep-card__title {
+  margin-top: var(--space-2);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  /* Caron clearance — see .latest__title. */
+  line-height: 1.26;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bone);
+  /* Titles vary wildly in length; hold every card to the same block. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+/* --- categories ---------------------------------------------------------- */
+
+.episodes__category + .episodes__category {
+  margin-top: var(--space-6);
+}
+
+.episodes__category-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  padding: 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 2vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.26;
+  /* A subhead, not a page title — display tracking is reserved for the big ones. */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.episodes__category-count {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  color: var(--concrete);
+}
+
+/* --- narrow -------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .episodes__inner {
+    padding: calc(var(--navbar-height) + var(--space-3)) 0 var(--space-5);
+  }
+
+  .episodes__eyebrow,
+  .episodes__head,
+  .episodes__notice-text,
+  .episodes__category-title {
+    padding-inline: var(--space-3);
+  }
+
+  .episodes__views {
+    margin-inline: var(--space-3);
+  }
+
+  .episodes__notice {
+    margin-inline: var(--space-3);
+  }
+
+  .ep-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ep-card,
+  .ep-card__thumb,
+  .episodes__view {
+    transition-duration: 1ms;
+  }
+}

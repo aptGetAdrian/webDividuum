@@ -46,7 +46,8 @@
   --ink: #0a1f26;        /* page ground. Must match the navbar's rgba. */
   --ink-deep: #071619;   /* recessed: tile wells, media letterboxing */
   --panel: #12353e;      /* raised: reveal panels, cards */
-  --rule: #1e4a57;       /* hairline rules and grid seams */
+  --rule: #1e4a57;       /* fine seams inside a section (grid gaps, list rows) */
+  --rule-strong: #37788c; /* section boundaries — needs to read at arm's length */
   --concrete: #7c949c;   /* muted mono labels, metadata */
   --bone: #ededea;       /* primary text — warmer than #fff, less glare */
   --signal: #2e9cdd;     /* the only color. Links, active state, the mark. */
@@ -60,9 +61,33 @@
   --track-mono: 0.18em;
 
   /* motion — snappy, not eased-soft */
-  --dur-snap: 120ms;
-  --dur-reveal: 300ms;
+  --dur-snap: 120ms;   /* hover/tap state changes stay instant */
+  --dur-reveal: 700ms; /* scroll-in is a slower, separate gesture */
   --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Scroll-in reveal, driven by useReveal(). One short rise per element, staggered
+   by --reveal-i. Nothing loops, nothing re-runs on scroll back up. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity var(--dur-reveal) var(--ease-snap),
+    transform var(--dur-reveal) var(--ease-snap);
+  transition-delay: calc(var(--reveal-i, 0) * 130ms);
+}
+
+.is-in [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 html {

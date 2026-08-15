@@ -10,8 +10,9 @@
 
   position: relative;
   background-color: var(--ink);
-  /* No bottom rule: the guests ring below already draws its own top rule, and
-     two adjacent hairlines read as one thick 2px line. */
+  /* One divider per boundary, always on the section's top edge. No bottom rule
+     anywhere, or adjacent sections stack two hairlines into a 2px line. */
+  border-top: 1px solid var(--rule-strong);
 }
 
 .latest::after {
@@ -23,9 +24,22 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* Fills the viewport so the section reads as one held frame between the hero and
+   the ring. min-height rather than height: on a short phone the stacked layout
+   is allowed to grow past the fold instead of overflowing. */
 .latest__inner {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;  /* fallback for browsers without svh */
+  min-height: 100svh; /* excludes mobile browser chrome, so no hidden overflow */
+  /* Pulled in off the full width so the eye doesn't have to travel the whole
+     screen between the title and the episode. Deliberately wider than the 1200px
+     used on contact and the footer — this section still wants to feel large. */
+  max-width: 1400px;
+  margin-inline: auto;
   padding: var(--space-6) var(--space-4);
 }
 
@@ -36,7 +50,7 @@
   gap: var(--space-3);
   margin: 0 0 var(--space-5);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
@@ -97,7 +111,7 @@
 
 .latest__meta-item dt {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 400;
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
@@ -107,7 +121,7 @@
 .latest__meta-item dd {
   margin: var(--space-1) 0 0;
   font-family: var(--font-mono);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--bone);
   font-variant-numeric: tabular-nums;
@@ -119,7 +133,7 @@
   border: 1px solid var(--rule);
   background: none;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
@@ -230,7 +244,7 @@
   padding: 0 var(--space-3);
   background-color: var(--ink-deep);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: var(--track-mono);
   text-transform: uppercase;

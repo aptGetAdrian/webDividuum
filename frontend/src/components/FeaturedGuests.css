@@ -14,6 +14,7 @@
 .guests {
   position: relative;
   background-color: var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 /* Very subtle analog grain. Purely optical — never intercepts pointer events. */
@@ -40,7 +41,6 @@
   grid-auto-rows: 1fr;
   gap: 1px;
   background-color: var(--rule); /* shows through the gap as hairline seams */
-  border-block: 1px solid var(--rule);
 }
 
 .guests__slot {
@@ -80,7 +80,7 @@
   width: 100%;
   padding: var(--space-4) var(--space-2) var(--space-2);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
@@ -148,7 +148,7 @@
   min-height: 0;
   margin-top: var(--space-1);
   font-family: var(--font-body);
-  font-size: clamp(0.6875rem, 0.78vw, 0.8125rem);
+  font-size: clamp(0.8125rem, 0.9vw, 0.9375rem);
   line-height: 1.5;
   color: var(--text-secondary);
   /* Descriptions vary in length; clamp rather than let one overflow its tile. */
@@ -166,7 +166,7 @@
   bottom: var(--space-2);
   z-index: 3;
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
@@ -231,7 +231,7 @@
   margin: 0;
   padding-top: var(--space-2);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: var(--track-mono);
   text-transform: uppercase;

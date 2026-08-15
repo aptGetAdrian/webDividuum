@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import useReveal from "../hooks/useReveal";
+import { formatDate, formatDuration, formatCount, parseTitle } from "../lib/episodeMeta";
 import "./LatestEpisode.css";
 
 /**
@@ -8,43 +10,6 @@ import "./LatestEpisode.css";
  * of the latest-video state and the /api/latest-video fetch lived only here.
  */
 
-/** "PT1H24M16S" → "1:24:16" (or "24:16" when under an hour). */
-const formatDuration = (iso) => {
-  const match = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(iso ?? "");
-  if (!match) return null;
-  const [h, m, s] = [match[1] ?? 0, match[2] ?? 0, match[3] ?? 0].map(Number);
-  const pad = (n) => String(n).padStart(2, "0");
-  return h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
-};
-
-const formatDate = (iso) => {
-  const date = new Date(iso);
-  return Number.isNaN(date.valueOf())
-    ? null
-    : new Intl.DateTimeFormat("sl-SI", { day: "numeric", month: "numeric", year: "numeric" }).format(date);
-};
-
-const formatCount = (value) => {
-  const n = Number(value);
-  return Number.isFinite(n) ? new Intl.NumberFormat("sl-SI").format(n) : null;
-};
-
-/**
- * YouTube titles carry a "| Individuum Podcast #50" tail that is pure noise on
- * Individuum's own site — but the number in it is worth keeping, so it moves
- * into the data strip where the other record numbers live.
- */
-const BRANDING_TAIL = /\s*[|–-]\s*individuum\s*podcast\s*(?:#\s*(\d+))?\s*$/i;
-
-const parseTitle = (raw) => {
-  if (!raw) return { title: null, episode: null };
-  const match = raw.match(BRANDING_TAIL);
-  return {
-    title: (match ? raw.replace(BRANDING_TAIL, "") : raw).trim(),
-    episode: match?.[1] ?? null,
-  };
-};
-
 const LatestEpisode = () => {
   const API_ADDRESS = import.meta.env.VITE_API_ADDRESS;
 
@@ -53,6 +18,7 @@ const LatestEpisode = () => {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [sectionRef, shown] = useReveal();
 
   useEffect(() => {
     const fetchLatest = async () => {
@@ -90,18 +56,22 @@ const LatestEpisode = () => {
   ].filter((item) => item.value);
 
   return (
-    <section className="latest" aria-labelledby="latest-title">
+    <section
+      className={`latest${shown ? " is-in" : ""}`}
+      aria-labelledby="latest-title"
+      ref={sectionRef}
+    >
       <div className="latest__inner">
-        <p className="latest__eyebrow">Najnovejša epizoda</p>
+        <p className="latest__eyebrow" data-reveal>Najnovejša epizoda</p>
 
         <div className="latest__body">
           <div className="latest__text">
-            <h2 className="latest__title" id="latest-title">
+            <h2 className="latest__title" id="latest-title" data-reveal style={{ "--reveal-i": 1 }}>
               {title ?? (failed ? "Epizode ni bilo mogoče naložiti" : " ")}
             </h2>
 
             {meta.length > 0 && (
-              <dl className="latest__meta">
+              <dl className="latest__meta" data-reveal style={{ "--reveal-i": 2 }}>
                 {meta.map((item) => (
                   <div className="latest__meta-item" key={item.label}>
                     <dt>{item.label}</dt>
@@ -115,6 +85,8 @@ const LatestEpisode = () => {
               <button
                 type="button"
                 className="latest__action"
+                data-reveal
+                style={{ "--reveal-i": 3 }}
                 onClick={() => window.location.reload()}
               >
                 Poskusi znova
@@ -122,6 +94,8 @@ const LatestEpisode = () => {
             ) : (
               <a
                 className="latest__action"
+                data-reveal
+                style={{ "--reveal-i": 3 }}
                 href="https://linktr.ee/individuumpodcast"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -131,7 +105,7 @@ const LatestEpisode = () => {
             )}
           </div>
 
-          <div className="latest__media">
+          <div className="latest__media" data-reveal style={{ "--reveal-i": 2 }}>
             {playing && videoId ? (
               <iframe
                 className="latest__frame"

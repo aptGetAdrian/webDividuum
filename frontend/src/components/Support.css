@@ -1,0 +1,191 @@
+/* =============================================================================
+   PODPRI — the support section.
+
+   Same language as the latest-episode block: eyebrow on a rule, Anton heading,
+   Inter prose, mono for labels and the action. The three uses sit in a strip
+   divided by 1px seams, echoing the guests ring.
+   ========================================================================== */
+
+.support {
+  position: relative;
+  background-color: var(--ink);
+  border-top: 1px solid var(--rule-strong);
+}
+
+.support::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.support__inner {
+  position: relative;
+  z-index: 1;
+  padding: var(--space-6) var(--space-4);
+}
+
+.support__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.support__eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--rule);
+}
+
+.support__head {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--space-5);
+  align-items: end;
+}
+
+.support__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4.2vw, 4.25rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.support__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.support__lead {
+  margin: 0;
+  max-width: 46ch;
+  font-family: var(--font-body);
+  font-size: clamp(1.0625rem, 1.3vw, 1.375rem);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Same hard-edged control as .latest__action. On hover it takes Buy Me a Coffee's
+   own yellow — colour borrowed from the destination, the way the footer's
+   platform icons work, rather than a second accent in the palette. */
+.support__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--bone);
+  text-decoration: none;
+  transition:
+    background-color var(--dur-snap) var(--ease-snap),
+    border-color var(--dur-snap) var(--ease-snap),
+    color var(--dur-snap) var(--ease-snap);
+}
+
+.support__cta:hover {
+  background-color: var(--coffee-color);
+  border-color: var(--coffee-color);
+  color: var(--ink);
+}
+
+.support__cta:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+.support__cta-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+}
+
+/* --- the three uses, divided like the ring ------------------------------- */
+
+.support__uses {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+  background-color: var(--rule); /* shows through the gap as hairline seams */
+  border-top: 1px solid var(--rule);
+}
+
+.support__use {
+  background-color: var(--ink);
+  padding: var(--space-3) var(--space-3) var(--space-3) 0;
+}
+
+.support__use:not(:first-child) {
+  padding-left: var(--space-3);
+}
+
+.support__use-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.support__use-text {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.1vw, 1.125rem);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* --- stacked ------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .support__inner {
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .support__head {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .support__uses {
+    grid-template-columns: 1fr;
+    margin-top: var(--space-5);
+  }
+
+  .support__use,
+  .support__use:not(:first-child) {
+    padding: var(--space-3) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .support__cta {
+    transition-duration: 1ms;
+  }
+}
