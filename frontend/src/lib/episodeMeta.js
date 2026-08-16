@@ -3,6 +3,14 @@
  * section on the home page and the episode archive.
  */
 
+/** "PT1H24M16S" → 5056 seconds. Returns 0 when the duration is missing. */
+export const durationSeconds = (iso) => {
+  const match = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(iso ?? "");
+  if (!match) return 0;
+  const [h, m, s] = [match[1] ?? 0, match[2] ?? 0, match[3] ?? 0].map(Number);
+  return h * 3600 + m * 60 + s;
+};
+
 /** "PT1H24M16S" → "1:24:16" (or "24:16" when under an hour). */
 export const formatDuration = (iso) => {
   const match = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(iso ?? "");

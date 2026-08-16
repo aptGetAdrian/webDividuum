@@ -172,17 +172,20 @@
 
 /* --- the contact sheet --------------------------------------------------- */
 
+/* The seams are drawn by each card's own 1px ring rather than by the container's
+   background showing through the gap. Adjacent rings meet inside the 1px gap and
+   still read as a single hairline — but an incomplete last row now shows the page
+   behind it instead of a solid block of seam colour. */
 .ep-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1px;
-  background-color: var(--rule); /* shows through the gap as hairline seams */
-  border-block: 1px solid var(--rule);
 }
 
 .ep-card {
   display: flex;
   flex-direction: column;
+  box-shadow: 0 0 0 1px var(--rule);
   background-color: var(--ink);
   text-decoration: none;
   color: inherit;
@@ -346,4 +349,24 @@
   .episodes__view {
     transition-duration: 1ms;
   }
+}
+
+/* --- closing card: the rest of the channel ------------------------------- */
+
+.ep-card--all .ep-card__media {
+  display: grid;
+  place-items: center;
+}
+
+.ep-card__all-mark {
+  font-family: var(--font-mono);
+  font-size: clamp(2.5rem, 4vw, 3.75rem);
+  line-height: 1;
+  color: var(--signal);
+  transition: color var(--dur-snap) var(--ease-snap);
+}
+
+.ep-card--all:hover .ep-card__all-mark,
+.ep-card--all:focus-visible .ep-card__all-mark {
+  color: var(--bone);
 }

@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import useReveal from "../hooks/useReveal";
-import { formatDate, formatDuration, parseTitle, pickThumbnail } from "../lib/episodeMeta";
+import { durationSeconds, formatDate, formatDuration, parseTitle, pickThumbnail } from "../lib/episodeMeta";
 import "./Episodes.css";
+
+const CHANNEL_VIDEOS = "https://www.youtube.com/@IndividuumPodcast/videos";
 
 const VIEWS = [
   { id: "all", label: "Vse epizode" },
@@ -80,6 +82,31 @@ const Episodes = () => {
 
   const categories = playlists.filter((p) => p.snippet.title !== "Individuum podcast");
 
+  /**
+   * /api/youtube-data truncates its `episodes` list to whatever survives inside the
+   * 200 most recent uploads, which drops everything older than roughly May 2025 —
+   * see fetch_all_videos() in backend/main.py. The playlists in the same response
+   * are NOT truncated, so the missing episodes are already on the page; they just
+   * aren't in the list the archive renders.
+   *
+   * Merging the two by id recovers the full archive without another request. Once
+   * the backend filters before it caps, this becomes a no-op de-duplication.
+   */
+  const allEpisodes = useMemo(() => {
+    const byId = new Map(episodes.map((video) => [video.id, video]));
+    for (const playlist of playlists) {
+      for (const video of playlist.videos ?? []) {
+        // Playlists keep anything over 60s; hold these to the same bar as an episode.
+        if (!byId.has(video.id) && durationSeconds(video.contentDetails?.duration) > 300) {
+          byId.set(video.id, video);
+        }
+      }
+    }
+    return [...byId.values()].sort(
+      (a, b) => new Date(b.snippet.publishedAt) - new Date(a.snippet.publishedAt),
+    );
+  }, [episodes, playlists]);
+
   return (
     <>
       <Helmet>
@@ -103,7 +130,7 @@ const Episodes = () => {
             </h1>
             {!loading && !error && (
               <p className="episodes__count" data-reveal style={{ "--reveal-i": 2 }}>
-                {episodes.length} epizod · {categories.length} kategorij
+                {allEpisodes.length} epizod · {categories.length} kategorij
               </p>
             )}
           </div>
@@ -136,9 +163,26 @@ const Episodes = () => {
 
           {!loading && !error && view === "all" && (
             <div className="ep-grid">
-              {episodes.map((video) => (
+              {allEpisodes.map((video) => (
                 <EpisodeCard key={video.id} video={video} />
               ))}
+
+              <a
+                className="ep-card ep-card--all"
+                href={CHANNEL_VIDEOS}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="ep-card__media">
+                  <span className="ep-card__all-mark" aria-hidden="true">↗</span>
+                </span>
+                <span className="ep-card__body">
+                  <span className="ep-card__meta">
+                    <span className="ep-card__no">YouTube</span>
+                  </span>
+                  <span className="ep-card__title">Oglej si vse epizode</span>
+                </span>
+              </a>
             </div>
           )}
 
