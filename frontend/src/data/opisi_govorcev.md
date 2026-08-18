@@ -59,3 +59,7 @@ Mariborčan, ki je po desetletjih na ulici in boju z alkoholom našel pot v trez
 ## Andrej Štremfelj
 
 Prvi Slovenec na Everestu (1979), skupaj z ženo tudi prvi zakonski par na vrhu sveta (1990). Za svoje dosežke je prejel Bloudkovo nagrado in Zlati cepin za življenjsko delo.
+
+## Daut Bećirović
+
+Preživel je obleganje in genocid v Srebrenici leta 1995, ko je bežal skozi gozdove in ostal ujet v obkoljeni enklavi brez hrane in zdravil. Delil je svojo zgodbo skrivanja, zimskih pohodov in bega iz mesta.

@@ -165,8 +165,15 @@
     gap: var(--space-5);
   }
 
+  /* Stacked, the columns end on "Kontakt" — whose own row rule already closes the
+     list off. The bottom bar's border would then be a second hairline with only
+     empty space between the two, so it borrows the row's rule instead of drawing
+     its own. Side by side (above 768px) there is no row rule under the shorter
+     column, so the border has to stay. */
   .footer__bottom {
-    margin-top: var(--space-5);
+    margin-top: var(--space-3);
+    padding-top: 0;
+    border-top: 0;
     flex-wrap: wrap;
   }
 

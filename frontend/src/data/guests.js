@@ -1,10 +1,14 @@
-import descriptionsRaw from "../../public/assets/guests/opisi_govorcev.md?raw";
+import descriptionsRaw from "./opisi_govorcev.md?raw";
 
 /**
  * Guest roster.
  *
- * Descriptions live in public/assets/guests/opisi_govorcev.md so the prose stays
- * editable as prose. This file holds everything the markdown can't express —
+ * Descriptions live in opisi_govorcev.md, next to this file, so the prose stays
+ * editable as prose. It sits in src/ rather than public/ because it is compiled
+ * into the bundle (?raw) — Vite refuses to import from public/, and a copy there
+ * would also be served as a stray public URL.
+ *
+ * This file holds everything the markdown can't express —
  * photo, episode link, and the mono role label shown on the tile — and joins the
  * two on `name`, which must match a `## heading` in the markdown exactly.
  *
@@ -27,9 +31,8 @@ const roster = [
   { name: 'Goran "Gogi" Šrok',   role: "Pričevalec",   image: "/assets/guests/goranSrok2.png",         link: "https://www.youtube.com/watch?v=jZTkqyXzgpI" },
   { name: "Uroš Dokl",           role: "Kustos",       image: "/assets/guests/urosDokl.png",           link: "https://www.youtube.com/watch?v=qQR6SndqFwQ" },
   { name: "Igor Plohl",          role: "Učitelj",      image: "/assets/guests/igorPlohl2.png",         link: "https://www.youtube.com/watch?v=g8pRKA66VS0" },
-  // NOTE: pre-existing in the old FeaturedGuests.jsx — Martin Bele points at Igor
-  // Plohl's episode. Left as found; needs the real video id.
-  { name: "dr. Martin Bele",     role: "Zgodovinar",   image: "/assets/guests/martinBele.png",         link: "https://www.youtube.com/watch?v=g8pRKA66VS0" },
+  { name: "dr. Martin Bele", role: "Zgodovinar", image: "/assets/guests/martinBele.png", link: "https://www.youtube.com/watch?v=KpYAdUFFUhY" },
+  { name: "Daut Bećirović",      role: "Preživelec",  image: "/assets/guests/dautBecirovic.png",      link: "https://www.youtube.com/watch?v=6E2sL_8mnNM" },
 ];
 
 /** Split "## Name\n\nbody" sections into { [name]: body }, collapsing wrapped lines. */

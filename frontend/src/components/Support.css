@@ -173,14 +173,24 @@
     align-items: start;
   }
 
+  /* The 1px seams are normally the container's background showing through the gap.
+     That only works while the cards are opaque — they fade in on scroll, and for
+     the length of the stagger the container reads as a solid teal block behind
+     them. Side by side the cards are narrow and it passes; stacked full-width it
+     dominates the section. So the seams move onto the cards as borders, and the
+     ground behind a card is the section itself at every point in the animation. */
   .support__uses {
     grid-template-columns: 1fr;
     margin-top: var(--space-5);
+    gap: 0;
+    background-color: transparent;
+    border-top: 0;
   }
 
   .support__use,
   .support__use:not(:first-child) {
     padding: var(--space-3) 0;
+    border-top: 1px solid var(--rule);
   }
 }
 

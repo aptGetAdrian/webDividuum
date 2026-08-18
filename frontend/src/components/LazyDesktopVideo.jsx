@@ -4,16 +4,16 @@ import { useEffect, useRef } from 'react';
 const LazyDesktopVideo = ({ onError, onLoad, className }) => {
   const videoRef = useRef(null);
   const DESKTOP_VIDEO = import.meta.env.VITE_DESKTOP_VIDEO
-  
+
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
       const handleLoad = () => onLoad?.();
       const handleError = () => onError?.();
-      
+
       video.addEventListener('loadeddata', handleLoad);
       video.addEventListener('error', handleError);
-      
+
       return () => {
         video.removeEventListener('loadeddata', handleLoad);
         video.removeEventListener('error', handleError);
@@ -33,7 +33,7 @@ const LazyDesktopVideo = ({ onError, onLoad, className }) => {
       preload="metadata"
       className={className}
       onError={onError} // Add this line
-      poster="/public/fallback.png"
+      poster="/fallback.png"
     >
       <source
         src={DESKTOP_VIDEO}

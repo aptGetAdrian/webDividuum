@@ -86,6 +86,7 @@
   text-transform: uppercase;
   color: var(--bone);
   background-image: linear-gradient(to top, rgba(7, 22, 25, 0.92), transparent);
+  transition: opacity var(--dur-snap) var(--ease-snap);
 }
 
 /* --- the reveal ---------------------------------------------------------- */
@@ -106,6 +107,8 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: var(--space-2);
+  /* Reserves the bottom band, which the role label and — on reveal — the CTA that
+     replaces it both occupy. Neither ever moves, so the type yields to them. */
   padding-bottom: calc(var(--space-2) + 1.5rem);
   background-color: rgba(7, 22, 25, 0.9);
   opacity: 0;
@@ -115,14 +118,38 @@
     visibility var(--dur-snap) var(--ease-snap);
 }
 
-.guests__tile:hover .guests__panel,
 .guests__tile:focus-visible .guests__panel,
 .guests__tile.is-revealed .guests__panel,
-.guests__tile:hover .guests__cta,
 .guests__tile:focus-visible .guests__cta,
 .guests__tile.is-revealed .guests__cta {
   opacity: 1;
   visibility: visible;
+}
+
+/* The role label steps aside for the CTA that takes its place. Fading the whole
+   element also retires its gradient, whose 32px ramp would otherwise reach up over
+   the last line of the bio and grey it out. */
+.guests__tile:focus-visible .guests__role,
+.guests__tile.is-revealed .guests__role {
+  opacity: 0;
+}
+
+/* :hover is quarantined behind a pointer query. Touch browsers emulate hover —
+   resting a finger on a tile to scroll latched the panel open, and it stayed open
+   until you tapped elsewhere. Behind (hover: hover) only a real pointer can do it,
+   which leaves touch entirely to .is-revealed: tap to read, tap again to open.
+   This pairs with matchMedia("(hover: none)") in FeaturedGuests.jsx — the two
+   conditions are exact complements and must be changed together. */
+@media (hover: hover) {
+  .guests__tile:hover .guests__panel,
+  .guests__tile:hover .guests__cta {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .guests__tile:hover .guests__role {
+    opacity: 0;
+  }
 }
 
 /* In a column flex container every item shrinks by default, which silently
@@ -159,14 +186,18 @@
   overflow: hidden;
 }
 
-/* Sits on the role label's line, at the other end of the tile. */
+/* Takes the role label's place rather than sitting beside it: same corner, same
+   size, same face, so the reveal reads as the label changing what it says. The two
+   used to share the bottom line, but the roles run long ("PREDAVATELJ",
+   "PRIČEVALEC") and on a two-column phone tile there was no room for both.
+   Above the label (z-index 4) so the cross-fade never shows one through the other. */
 .guests__cta {
   position: absolute;
-  right: var(--space-2);
+  left: var(--space-2);
   bottom: var(--space-2);
-  z-index: 3;
+  z-index: 4;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
